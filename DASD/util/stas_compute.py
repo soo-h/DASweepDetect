@@ -188,46 +188,6 @@ def normalize(data):
     v = (data - mu) /sigma
     v[np.isnan(v)] = 0
     return v
-
-
-def ihsCompute(snpMatrix,position):
-    #后续可考虑传入freD
-    #position中全为缺失返回-1
-    freD = np.sum(snpMatrix,axis=1) / snpMatrix.shape[1]
-    ihs = allel.ihs(snpMatrix, position, map_pos=None, min_ehh=0.05, min_maf=0.05, 
-                include_edges=True, gap_scale=20000, max_gap=200000, is_accessible=None, use_threads=True)
-    freD = freD[~np.isnan(ihs)]
-    position = position[~np.isnan(ihs)]
-    ihs = ihs[~np.isnan(ihs)]
-    
-    if len(position) > 0:
-        dafBin,ihsBin,posBin = daf_Win(freD,ihs,position,region=200)
-        ihsNormalize = abs(np.concatenate([normalize(vSet) for vSet in ihsBin]))
-        posNormalize = np.concatenate(posBin)
-    
-        posNormalize,ihsNormalize = Phy_Win(posNormalize,ihsNormalize,region=200)
-    else:
-        posNormalize,ihsNormalize = np.array([-1]),np.array([-1])
-   
-    return posNormalize,ihsNormalize
-
-def nslCompute(snpMatrix,position):
-    freD = np.sum(snpMatrix,axis=1) / snpMatrix.shape[1]
-    nsl = allel.nsl(snpMatrix,use_threads=True)
-    
-    freD = freD[~np.isnan(nsl)]
-    position = position[~np.isnan(nsl)]
-    nsl = nsl[~np.isnan(nsl)]
-    
-    if len(position) > 0:
-        dafBin,nslBin,posBin = daf_Win(freD,nsl,position,region=200)
-        nslNormalize = abs(np.concatenate([normalize(vSet) for vSet in nslBin]))
-        posNormalize = np.concatenate(posBin)
-        posNormalize,nslNormalize = Phy_Win(posNormalize,nslNormalize,region=200)
-    else:
-        posNormalize,nslNormalize = np.array([-1]),np.array([-1])
-    
-    return posNormalize,nslNormalize
     
 
 def deltaihh(h, pos, map_pos=None, min_ehh=0.05, min_maf=0.05, include_edges=False, gap_scale=20000, max_gap=200000, is_accessible=None, use_threads=True):
@@ -262,24 +222,6 @@ def deltaihh(h, pos, map_pos=None, min_ehh=0.05, min_maf=0.05, include_edges=Fal
     ihh1 = ihh1_fwd + ihh1_rev
     return np.abs(ihh1 - ihh0)
 
-def dihhCompute(snpMatrix,position):
-    freD = np.sum(snpMatrix,axis=1) / snpMatrix.shape[1]
-    score = deltaihh(snpMatrix, position, map_pos=None, min_ehh=0.05, min_maf=0.05, 
-                include_edges=True, gap_scale=20000, max_gap=200000, is_accessible=None, use_threads=True)
-    freD = freD[~np.isnan(score)]
-    position = position[~np.isnan(score)]
-    dihh = score[~np.isnan(score)]
-    
-    if len(position) > 0:
-        dafBin,dihhBin,posBin = daf_Win(freD,dihh,position,region=200)
-        dihhNormalize = abs(np.concatenate([normalize(vSet) for vSet in dihhBin]))
-        posNormalize = np.concatenate(posBin)
-    
-        posNormalize,dihhNormalize = Phy_Win(posNormalize,dihhNormalize,region=200)
-    else:
-        posNormalize,dihhNormalize = np.array([-1]),np.array([-1])
-   
-    return posNormalize,dihhNormalize
 
 ############################基于溯祖的方法#######################
 def HAF(snpMatrix):

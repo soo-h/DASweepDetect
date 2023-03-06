@@ -67,7 +67,7 @@ parser_data_annotation = subparsers.add_parser('data_annotation', help='step4:An
 parser_data_annotation.add_argument('-i ','--input',help='<string>: Path to the VCF or VCF.gz File'\
     '\n When multiple files are entered, Please joint by ,'\
     '\n Example: file1,file2,file3')
-parser_data_annotation.add_argument('-config_file', help='Path to the configure file')
+parser_data_annotation.add_argument('--config_file', help='Path to the configure file')
 parser_data_annotation.add_argument('-o ','--out',help='Path to the folder where dataset to be stored')
 parser_data_annotation.set_defaults(func='data_annotation')
 
@@ -108,7 +108,7 @@ if 'func' in args:
     
         configure_file = args.config_file
         opt_file = args.out
-        cmd_simu = f"python3.8 ./script/simudata_gen.py {configure_file} {opt_file}"
+        cmd_simu = f"python3.8 DASD/simudata_gen.py {configure_file} {opt_file}"
         subprocess.call(cmd_simu,shell=True)
 
     elif args.func == 'calc_domain':
@@ -120,7 +120,7 @@ if 'func' in args:
         core = args.core
         outdir = args.out
 
-        cmd_calcsimu = f"python3 DASD/simudata_to_feature.py {ipt} {filter} {core} {outdir}"
+        cmd_calcsimu = f"python3.8 DASD/simudata_to_feature.py {ipt} {core} {filter} {outdir}"
         subprocess.call(cmd_calcsimu,shell=True)
 
 
@@ -151,7 +151,7 @@ if 'func' in args:
         configure_file = args.config_file
         outdir = args.out
 
-        cmd_simu = f"python3 ./DASD/label_data.py {ipt} {configure_file} {outdir}"
+        cmd_simu = f"python3.8 ./DASD/label_data.py {ipt} {configure_file} {outdir}"
         subprocess.call(cmd_simu,shell=True)
 
     elif args.func == 'train':

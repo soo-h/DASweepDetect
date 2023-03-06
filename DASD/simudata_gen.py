@@ -1,5 +1,7 @@
 import sys
 import subprocess
+import math
+
 ## 通过读取configure文件进行模拟
 ## step1.读取configure文件
 ## step2.判断是否符合模拟条件
@@ -95,7 +97,7 @@ with open(configure_file) as f:
 
 if 'Pxx' in configure_dict:
     rep1 = int(essen_parameter['rep']) // 2
-    rep2 = int(essen_parameter['rep']) // 2 + 1
+    rep2 = math.ceil(int(essen_parameter['rep']) // 2) 
 
     configure_dict1 = {}
     configure_dict2 = {}

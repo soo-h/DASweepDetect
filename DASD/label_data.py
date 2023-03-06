@@ -1,13 +1,19 @@
 import sys
 import numpy as np
 from sklearn.model_selection import train_test_split
+from util.check_tools import get_input_file
+import os
+
 
 ## 输入配置文件
-featureMapSet = sys.argv[1].split(',')
+ipt = sys.argv[1]
 config = sys.argv[2]
 outdir = sys.argv[3]
-if not outdir.endswith('/'):
-    outdir = f'{str(outdir)}/'
+
+
+
+featureMapSet = get_input_file(ipt)
+
 
 
 with open(config,'r') as f:
@@ -34,6 +40,9 @@ def label_gene(clsName,lab_dict):
     if not query:
         sys.exit('ClassName Error: Name not in dict !!!')
     return 0
+
+if len(lab_dict.keys()) != len(featureMapSet):
+    sys.exit("Error: Number of sample classify not compare with Number of label !!!")
 
 dataSet = []
 dataLabel = []

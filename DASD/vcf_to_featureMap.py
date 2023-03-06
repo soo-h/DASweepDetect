@@ -97,7 +97,7 @@ def para_run(process_query,coreNum):
                 break
 
             process_running.append(p)
-            p.stsart()
+            p.start()
 
         if fin:
             break
