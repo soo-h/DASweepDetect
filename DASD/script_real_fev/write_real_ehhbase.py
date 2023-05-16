@@ -3,17 +3,8 @@ import sys
 sys.path.append('..')
 from util import window_tools
 
-## 单倍型方法 的两个思路
-## 1. 如下： 
-##         <1>单独计算每个dafBin的均值和方差
-##         <2>遍历每个大窗口,对每个大窗口利用<1>中的信息，基于相同的dafBin进行标准化
-
-## 2.在1.<1>的同时，直接对所有数据进行标准化，再基于pos和value的对应关系，通过对pos排序完成value的排序
-
-
 
 def normBin(filtpos,staValue,freD):
-    #filtpos并不需要，但为了使用daf_Win函数，添加filtpos使接口匹配
     freD_dropna = freD[~np.isnan(staValue)]
     filtpos_dropna = np.asarray(filtpos)[~np.isnan(staValue)]
     staValue_dropna = staValue[~np.isnan(staValue)]
@@ -22,7 +13,6 @@ def normBin(filtpos,staValue,freD):
     return ihsBin
 
 def norm_by_daf(ihsBin,normBin):
-    ####normBin和ihsBin长度需相同
     for idx in range(len(ihsBin)):
         if len(ihsBin[idx]):
             if not np.sum(np.isnan(normBin[idx])):
@@ -33,15 +23,11 @@ def norm_by_daf(ihsBin,normBin):
     return ihsBin
 
 def statCompute(subStatValue,subpos,subfreD,normBin,region=200):
-    #传入要进行标准化的统计量
-    # 保留位置信息
     locs = window_tools.vector_loc(subpos,region)
-    # 去NA
     subfreD = subfreD[~np.isnan(subStatValue)]
     subpos = subpos[~np.isnan(subStatValue)]
     subStatValue = subStatValue[~np.isnan(subStatValue)]
     if len(subpos) > 0:
-        # 生成n个bin,分别进行标准化
         dafBin,ihsBin,posBin = window_tools.daf_Win(subfreD,subStatValue,subpos,region)
         ihsNormalize = norm_by_daf(ihsBin,normBin)
         posNormalize = np.concatenate(posBin)
@@ -58,7 +44,6 @@ def statCompute(subStatValue,subpos,subfreD,normBin,region=200):
 
 import copy
 
-#############################方案2###############
 def normalize(data):
     mu = np.mean(data)
     sigma = np.std(data)
@@ -67,10 +52,6 @@ def normalize(data):
 
 
 def normBin2(filtpos,staVal,freD):
-    """
-    直接进行标准化
-    """
-    #filtpos并不需要，但为了使用daf_Win函数，添加filtpos使接口匹配
     staValue = copy.deepcopy(staVal)
     freD_dropna = freD[~np.isnan(staValue)]
     filtpos_dropna = np.asarray(filtpos)[~np.isnan(staValue)]
@@ -85,11 +66,7 @@ def normBin2(filtpos,staVal,freD):
     return staValue
 
 
-###################################################################
-
-
 def write_ihs(ihsSet,posSet,dafSet,normBin,fi):
-    #奇数行为pos，偶数行为value
     ihsGroupSet = np.zeros(shape=(len(ihsSet),200))
     left = 0
 
@@ -110,7 +87,6 @@ def write_ihs(ihsSet,posSet,dafSet,normBin,fi):
 
 
 def write_dihh(dihhSet,posSet,dafSet,normBin,fi):
-    #奇数行为pos，偶数行为value
     dihhGroupSet = np.zeros(shape=(len(dihhSet),200))
     left = 0
 
@@ -131,7 +107,6 @@ def write_dihh(dihhSet,posSet,dafSet,normBin,fi):
 
 
 def write_nsl(nslSet,posSet,dafSet,normBin,fi):
-    #奇数行为pos，偶数行为value
     nslGroupSet = np.zeros(shape=(len(nslSet),200))
     left = 0
 

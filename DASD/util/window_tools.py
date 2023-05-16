@@ -45,14 +45,14 @@ def ms_read(file):
                 if len(sampleLine) != segsites:
                     sys.exit("Malformed ms-style output file %s segsites but %s columns in line: %s; line %s of %s samples \n" %  # NOQA
                                 (segsites, len(sampleLine), sampleLine, i, numSamples)) # NOQA
-                #根据nsample和segsite构建np.array用于存储数据，可能会提升速度
+
                 samples.append([int(i) for i in sampleLine])
             if len(samples) != numSamples:
                 raise Exception
         hapArraysIn.append(samples)
         positionArrays.append(positions)
         line = f.readline()
-        # advance to the next non-empty line or EOF
+
         while line and line.strip() == "":
             line = f.readline()
         if line[:3] == "dis":
@@ -62,10 +62,7 @@ def ms_read(file):
             numSamples, numSims = int(numSamples), int(numSims)
         while line and line.strip() != "//":
             line = f.readline()
-         #sys.stderr.write("finished rep %d\n" %(len(hapArraysIn)))
-    #if len(hapArraysIn) != numSims:
-        #sys.exit("Malformed ms-style output file: %s of %s sims processed. \n" % # NOQA
-                    #(len(hapArraysIn), numSims))
+
 
     f.close()
     return headerIn,segsiteIn,hapArraysIn, positionArrays
@@ -74,10 +71,9 @@ def ms_read(file):
 
 
 
-def ms_read_pipline(file,cutoff):  # sourcery skip: raise-specific-error
-    # 输出单倍型矩阵shape：(hap,varience)
+def ms_read_pipline(file,cutoff):
+
     f = open(file,'r')
-    #filt_count = 0
 
     headerIn = []
     segsiteIn = []
@@ -86,7 +82,6 @@ def ms_read_pipline(file,cutoff):  # sourcery skip: raise-specific-error
     _, numSamples, numSims = header.strip().split()[:3]
     numSamples, numSims = int(numSamples), int(numSims)
 
-    # advance to first simulation
     line = f.readline()
     while line.strip() != "//":
         line = f.readline()
@@ -116,21 +111,19 @@ def ms_read_pipline(file,cutoff):  # sourcery skip: raise-specific-error
             for i in range(numSamples):
                 sampleLine = f.readline().strip()
                 if len(sampleLine) != segsites:
-                    sys.exit("Malformed ms-style output file %s segsites but %s columns in line: %s; line %s of %s samples \n" %  # NOQA
-                                (segsites, len(sampleLine), sampleLine, i, numSamples)) # NOQA
-                #根据nsample和segsite构建np.array用于存储数据，可能会提升速度
+                    sys.exit("Malformed ms-style output file %s segsites but %s columns in line: %s; line %s of %s samples \n" %
+                                (segsites, len(sampleLine), sampleLine, i, numSamples))
                 samples[i] =  [int(i) for i in sampleLine]
             samples = np.asarray(samples,dtype=int)
             if samples.shape[0] != numSamples:
                 raise Exception
         
         if segsites < cutoff:
-            #filt_count += 1
             pass
         else:
             yield (samples,positions)
         line = f.readline()
-        # advance to the next non-empty line or EOF
+
         while line and line.strip() == "":
             line = f.readline()
         if line[:3] == "dis":
@@ -262,10 +255,7 @@ def Phy_Win2D(pos,value,cutpos):
     return posBin,valueBin
 
 def Phy_Win(pos,value,region=200):
-    """
-    用于模拟数据的physical windows,真实数据与之不同
-    因为真实数据需对绝对位置信息有需求,而模拟数据默认位置位于0-1间
-    """
+
     if max(pos) > 1:
         pos = pos / 100000
     pos = np.array(pos)
@@ -286,12 +276,9 @@ def Phy_Win(pos,value,region=200):
 
 
 
-############下方函数未进行二轮整合
-####################用于EHH方法的daf windows############
+
 def daf_Win(daf,value,pos,region=200):
-    """
-    uncheck : 是否同时适用于模拟数据和真实数据
-    """
+
     daf_Pw = []
     fre_d_Wp = []
     pos_Wp = []
@@ -317,7 +304,7 @@ def daf_Win(daf,value,pos,region=200):
         pos_Wp.append(p[d<i])
         j=i
     return daf_Pw,fre_d_Wp,pos_Wp
-###################### 用于real data 的窗口函数
+# 用于real data 的窗口函数
 def position_windows(pos, size, start, stop, step):
 
     last = False

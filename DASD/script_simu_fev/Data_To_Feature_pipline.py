@@ -1,20 +1,17 @@
-
-# 后续修改*，具体到载入的函数
-## 若仅用于ms_read_pipline 接口则无需增加检查函数
+import os
 
 from util import stas_compute
 from util.stas_compute import *
 from util.window_tools import *
-import time
-import os
+from util.process_tools import para_run
 
-## region参数--- 决定特征图size
+
 def write_stats(data_generator, fi,stats, gridNum, snpNum):
     """
     组合统计量函数和自定义滑窗函数,完成除沿用allele框架外的EHH方法外其它方法的生成与整合
     用于真实数据,和ms的区别在于phy_win的划分方式,即增加了vector_loc和Phy_Win部分
     """
-    ## 仅保存value信息
+    # 仅保存value信息
     with open(fi,'w') as f:
         for snpMatrix,position in data_generator:
 
@@ -86,9 +83,10 @@ def write_haf(data_generator,fi,gridNum=200,snpNum=50):
     
     return 0
 
-###################### EHH方法
+# EHH方法
 def ehh_base_unstandard(ipt_name,cutoff,opt_name,stas):
 
+    threads=False
     L = 100000
 
     with open(opt_name,'w') as f:
@@ -99,10 +97,10 @@ def ehh_base_unstandard(ipt_name,cutoff,opt_name,stas):
         for snpMatrix,position in data_generator:
             snpMatrix = np.transpose(snpMatrix)
             if stas.__name__ != 'nsl':
-                value = stas(snpMatrix,position*L,min_ehh=0.05,min_maf=0.05,include_edges=True,gap_scale=20000,max_gap=200000,is_accessible=None,use_threads=True)
+                value = stas(snpMatrix,position*L,min_ehh=0.05,min_maf=0.05,include_edges=True,gap_scale=20000,max_gap=200000,is_accessible=None,use_threads=threads)
                 #value = stas(snpMatrix,position*L,min_ehh=0.05,min_maf=0.05,include_edges=False,gap_scale=20000,max_gap=200000,is_accessible=None,use_threads=True)
             else:
-                value = stas(snpMatrix,use_threads=True)
+                value = stas(snpMatrix,use_threads=threads)
             freD = np.sum(snpMatrix,axis=1) / snpMatrix.shape[1]   
     
             ## drop NA
@@ -234,68 +232,61 @@ def out_standard_EHHbase(file,norm_info_base_freq,opt):
     return 0
 
 
-def out_EHHbase_pipline(nameSet,cutoff,outdir,stas,stas_key_word,coreNum):
+def out_EHHbase_pipline(nameSet,cutoff,outdir,stas,stas_key_word,core_num):
+    """
+    :param nameSet:
+    :param cutoff:
+    :param outdir:
+    :param stas:
+    :param stas_key_word:
+    :param core_num: <= len(nameSet)
+    :return:
+    """
+    if core_num > len(nameSet):
+        print("Warning: too much cpu be allocation to EHHbase_pipline!!!")
+
     summary_name_key_word = f'{stas_key_word}_summaryInfo'
-    
-    process = []
+    # 并行
+    process_query = []
     for ipt in nameSet:
         name = ipt.split('/')[-1]
         opt_name = f'{outdir}{name}{summary_name_key_word}'
-        p = multiprocessing.Process(target=ehh_base_unstandard,args=([ipt,cutoff,opt_name,stas]))
-        process.append(p)
-        p.start()
-    while np.sum([p.is_alive() for p in process]) != 0:
-        time.sleep(10)
-    _ = [p.terminate() for p in process]
-        
-    summary_fileName = [name for name in os.listdir(outdir) if  name.endswith(summary_name_key_word)] 
-    summary_fileSet = [f'{outdir}{name}' for name in summary_fileName] 
 
-    #summary_fileSet = [f'{outdir}{name}' for name in os.listdir(outdir) if  name.endswith(summary_name_key_word)] 
-        
+        p = multiprocessing.Process(target=ehh_base_unstandard,args=([ipt,cutoff,opt_name,stas]))
+        process_query.append(p)
+    
+    process_query = iter(process_query)
+    _ = para_run(process_query, core_num)
+
+    # 获取用于标准化的参数
+    summary_fileName = [name for name in os.listdir(outdir) if  name.endswith(summary_name_key_word)] 
+    summary_fileSet = [f'{outdir}{name}' for name in summary_fileName]
     norm_info_base_freq = getNorm_info(summary_fileSet)
 
-######改(2023.2.20注):1.将core作为write接口函数，优化core和进程的关系;2.串行视为core=1，从而将if else优化掉
-    process = []
+    # 完成每个文件的标准化
     for i in range(len(summary_fileSet)):
         summary_path = summary_fileSet[i]
         summary_name = summary_fileName[i]
-        #ipt = nameSet[i]
-        #name = ipt.split('/')[-1]
-        
-        name = summary_name.split(stas_key_word)[0]#修改原因：nameSet和summary_fileSet间并非一一对应关系（修改日期：2023.2.24）
-        opt = f'{outdir}{name}_{stas_key_word}Stastic'
-        if coreNum == 4:
-            p = multiprocessing.Process(target=out_standard_EHHbase,args=([summary_path,norm_info_base_freq,opt]))
-            p.start()
-            process.append(p)
 
-        else:
-            out_standard_EHHbase(summary_path,norm_info_base_freq,opt)
-    
-    if len(process) > 0:
-        while np.sum([p.is_alive() for p in process]) != 0:
-            time.sleep(10)
-######################### 需优化部分截至线(还有write接口和主函数中的args参数)################
+        name = summary_name.split(stas_key_word)[0]
+        opt = f'{outdir}{name}_{stas_key_word}Stastic'
+        out_standard_EHHbase(summary_path,norm_info_base_freq,opt)
+
     return 0
 
-def write_ihs(nameSet,cutoff,outdir):
-    coreNum = 4
+def write_ihs(nameSet,cutoff,outdir, coreNum):
     stas_key_word = 'ihs'
     stas = allel.ihs
     out_EHHbase_pipline(nameSet,cutoff,outdir,stas,stas_key_word,coreNum)
     return 0
 
-
-def write_nsl(nameSet,cutoff,outdir):
-    coreNum = 4
+def write_nsl(nameSet,cutoff,outdir, coreNum):
     stas_key_word = 'nsl'
     stas = allel.nsl
     out_EHHbase_pipline(nameSet,cutoff,outdir,stas,stas_key_word,coreNum)
     return 0
 
-def write_dihh(nameSet,cutoff,outdir):
-    coreNum = 4
+def write_dihh(nameSet,cutoff,outdir, coreNum):
     stas_key_word = 'dihh'
     stas = deltaihh
     out_EHHbase_pipline(nameSet,cutoff,outdir,stas,stas_key_word,coreNum)

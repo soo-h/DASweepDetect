@@ -10,7 +10,7 @@ from multiprocessing.pool import ThreadPool
 from util.window_tools import *
 
 
-######################### 表征sfs的统计量 ##################
+# 表征sfs的统计量
 
 def eng_compute(matrix):
     logp = np.log2(matrix)
@@ -57,10 +57,9 @@ def sfs_compute(matrix):
     return matrix_stastic(pos_Wp/np.sum(pos_Wp))
 
 
-##################### 表征sfs杂合度的统计量 #########################
+#表征sfs杂合度的统计量
 def dafCompute(pos,snpMatrix):
-    #添加判断是否为np.array的语句
-    #输出格式：前三行依次为：postion、fre_d,fre_delta
+
     freD = np.mean(snpMatrix,axis=0)
     freDelta = np.abs(2 * freD - 1)
     dif_pos = np.diff(pos)
@@ -81,13 +80,7 @@ def theta_pai(snpMatrix):
 
 
 def w_theta(pos,snpMatrix):
-    """
-    wtheta:
-    ?????????nbase求解问题,使用100k或base数
-    ???窗口大小对于sfs方法有较大影响
-    """
-    # n个碱基对
-    #nbase = pos[-1] - pos[0] +1
+
     dif_pos = np.diff(pos)
     nbase = int((np.max(pos) - np.min(pos)) / np.min(dif_pos[dif_pos > 0]))
 
@@ -95,15 +88,10 @@ def w_theta(pos,snpMatrix):
     nseq,nseg = snpMatrix.shape[0],snpMatrix.shape[1]
     an = np.sum(1/np.arange(1,nseq))
     theta = nseg / an
-    #return theta / segsite
     
     return theta / nbase
 
 def theta_H(pos, snpMatrix):
-    """
-    thetaH:
-    nbase求解问题
-    """
     dif_pos = np.diff(pos)
     nbase = int((np.max(pos) - np.min(pos)) / np.min(dif_pos[dif_pos > 0]))
 
@@ -134,15 +122,13 @@ def sta_base_allefre(pos,snpMatrix):
     
     return [daf,pai,wtheta,htheta,h_FayWu]
 
-################### 基于单倍型的方法 ###############
+# 基于单倍型的方法
 
 def hapFreq(snpMatrix):
     """
     用于统计单倍型频率,方便后续H1、H12、H123、H2dH1、单倍型杂合度的计算
     """
-    # 利用哈希值计算单倍型频率
     hash_value = [hash(tuple(i)) for i in snpMatrix]
-    # 对哈希值进行统计，并根据数量做降序排列
     counts = sorted(collections.Counter(hash_value).values(), reverse=True)
     freq = np.asarray(counts) / len(hash_value)
     
@@ -177,10 +163,6 @@ def stas_base_hapFre(snpMatrix):
     
     return [h1,h12,h123,h2dh1,hap_diversity,Nhap]
 
-###############################待检验########################
-################ 基于EHH
-### Q1:ihs、nSL部分调用allel完成，无法和自定义窗口函数组合
-### Q2：dihh沿用allel框架完成计算，多出一个自定义计算函数，且无法和自定义窗口组合
 
 def normalize(data):
     mu = np.mean(data)
@@ -223,12 +205,11 @@ def deltaihh(h, pos, map_pos=None, min_ehh=0.05, min_maf=0.05, include_edges=Fal
     return np.abs(ihh1 - ihh0)
 
 
-############################基于溯祖的方法#######################
+#基于溯祖的方法
 def HAF(snpMatrix):
     return np.dot(snpMatrix,np.transpose(snpMatrix)).sum(1)
 
 def sum_sta(data):
-    #data每组数据以行排序（即组内元素写入一行）
     if data.ndim != 2:
         sys.exit("dim is not equal 2")
     
@@ -242,7 +223,6 @@ def sum_sta(data):
 
 def safecompute(snpMatrix):
     """代码来自于safeclass"""
-    ## ERROR snpMatrix 不应转置
     snpMatrix = snpMatrix.T
     haf = np.dot(snpMatrix,snpMatrix.T).sum(1)
     haf_matrix = haf.reshape(-1,1) * snpMatrix

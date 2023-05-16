@@ -110,7 +110,7 @@ def write_standard_EHHbase(snpMatrix, filtpos,win_loc,tolearance,fi):
     nslSet = []
     dihhSet = []
     posSet = []
-    ### 参数3---过滤区域条件
+    # 参数3---过滤区域条件
     for loc in win_loc:
         if loc[1] - loc[0] >= tolearance:
             # varience,hap
@@ -120,7 +120,7 @@ def write_standard_EHHbase(snpMatrix, filtpos,win_loc,tolearance,fi):
             nslSet.append(nsl[loc[0]:loc[1]])
             dihhSet.append(dihh[loc[0]:loc[1]])
             posSet.append(filtpos[loc[0]:loc[1]])
-    ######获取标准化信息
+    # 获取标准化信息
     ihsNormBin = write_real_ehhbase.normBin(filtpos,ihs,freD)
     nslNormBin = write_real_ehhbase.normBin(filtpos,nsl,freD)
     dihhNormBin = write_real_ehhbase.normBin(filtpos,dihh,freD)

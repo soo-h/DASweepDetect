@@ -3,8 +3,6 @@ import sys
 
 
 def namesort(nameSet):
-    ##remove会对传入变量做修改，影响外部变量，后期需修改
-    ##1.深拷贝；or 排序算法 or 整合前置脚本，统一命名规则以便于排序
     
     sort_name = []
     for sta in ['HAFStastic','safe','kappa','phi','dihhStastic',\
@@ -48,8 +46,6 @@ def readstastic(name):
     return t_sta
 
 def loadstastic(nameSet):
-    #name排序：ch、cs、ph、ps
-    #staSet = np.zeros(shape=(2500*4,200))
 
     nameSet = namesort(nameSet)
     print(nameSet)
