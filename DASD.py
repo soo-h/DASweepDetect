@@ -2,16 +2,26 @@
 import argparse
 import subprocess
 import sys
+import os
 
 DASD_version = '1.0.1'
 
+description_text = "\n".join([
+    "==========================================================================",
+    "DASD: (D)omain (A)daptation (S)weep (D)etection",
+    "==========================================================================",
+    f"Version: DASD {DASD_version}",
+    "--------------------------------------------------------------------------",
+])
+
+
+class PreserveNewlinesHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
+    def _fill_text(self, text, width, indent):
+        # 按换行符拆分文本，并在每个段落上应用缩进
+        return "".join(indent + line for line in text.splitlines(keepends=True))
+
 ## 程序说明
-parser = argparse.ArgumentParser(description=\
-'=============================================================================='\
-'DASD: (D)omain (A)daptation (S)weep (D)etection '\
-'\n============================================================================='\
-f'\n Version: DASD {DASD_version}'\
-'\n-----------------------------------------------------------------------------', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser(description=description_text,formatter_class=PreserveNewlinesHelpFormatter)
 
 ## -v 版本 
 parser.add_argument(
@@ -24,8 +34,8 @@ subparsers = parser.add_subparsers(help='sub-command help')
 ## parser1：模拟数据
 parser_simu = subparsers.add_parser('simu', help='step1:Simulate Data',description=\
 '=============================================================================='
-'|Note: this is complete by calling Discoal(doi:10.1093/bioinformatics/btw556)|'
-'==============================================================================')
+'\n|Note: this is complete by calling Discoal(doi:10.1093/bioinformatics/btw556)|'
+'\n==============================================================================',formatter_class=PreserveNewlinesHelpFormatter)
 parser_simu.add_argument('--config_file','-i',help='Path to the configure file')
 parser_simu.add_argument('-o','--out',help='Output name of the simulation data')
 parser_simu.set_defaults(func='simu')
@@ -67,7 +77,7 @@ parser_data_annotation = subparsers.add_parser('data_annotation', help='step4:An
 parser_data_annotation.add_argument('-i ','--input',help='<string>: Path to the VCF or VCF.gz File'\
     '\n When multiple files are entered, Please joint by ,'\
     '\n Example: file1,file2,file3')
-parser_data_annotation.add_argument('--config_file', help='Path to the configure file')
+parser_data_annotation.add_argument('--config', help='Path to the configure file')
 parser_data_annotation.add_argument('-o ','--out',help='Path to the folder where dataset to be stored')
 parser_data_annotation.set_defaults(func='data_annotation')
 
@@ -81,11 +91,14 @@ parser_train.add_argument('--test-data',help='Path to the Valid data')
 parser_train.add_argument('--test-label',help='Path to the Valid Label data')
 parser_train.add_argument('-t','--target', help='Path to the feature map file(single or multi) / directory of target data'\
 '\n multi file should joint by , ; directory should only include feature map file')
+parser_train.add_argument('-M',help='Model number to train', required=False, default=5)
+parser_train.add_argument('-s','--save',help='1 is save model generated during iteration and 0 is only save best model', required=False, default=0)
 parser_train.add_argument('-o ','--out',help='Path to the model to be stored')
 parser_train.set_defaults(func='train')
 ## parser6：预测
 parser_pred = subparsers.add_parser('pred',help="step6:Sweep Dectection And Classifition")
 parser_pred.add_argument('-m','--model',help='Path to model')
+parser_pred.add_argument('-M',help='Number of integrated models')
 parser_pred.add_argument('-f','--feature',help='Path to feature map of target data')
 parser_pred.add_argument('-p','--position',help='Path to position infomation of target data')
 parser_pred.add_argument('-o','--out',help='Path to the result of output')
@@ -97,7 +110,12 @@ parser_pred.set_defaults(func='pred')
 # 内部：args = parser.parse_args([para1,para2])
 args = parser.parse_args()
 
+currend_work_dir = os.getcwd()
+DASD_directory = os.path.dirname(os.path.abspath(__file__))
 
+def convert_abs_path(realtive_path, cwd=currend_work_dir):
+    abs_path = os.path.abspath(os.path.join(cwd, realtive_path))
+    return abs_path
 
 if 'func' in args:
     if args.func == 'simu':
@@ -106,10 +124,15 @@ if 'func' in args:
             sys.exit(1)
     
     
-        configure_file = args.config_file
-        opt_file = args.out
-        cmd_simu = f"python3.8 DASD/simudata_gen.py {configure_file} {opt_file}"
+        configure_file = convert_abs_path(args.config_file)
+        opt_file = convert_abs_path(args.out)
+        script = convert_abs_path('DASD/simudata_gen.py',DASD_directory)
+        discoal_path = convert_abs_path('discoal',DASD_directory)
+        cmd_simu = f"python3.8 {script} {configure_file} {opt_file} {discoal_path}"
         subprocess.call(cmd_simu,shell=True)
+
+
+
 
     elif args.func == 'calc_domain':
         if args.input is None:
@@ -148,7 +171,7 @@ if 'func' in args:
             sys.exit(1)
 
         ipt = args.input
-        configure_file = args.config_file
+        configure_file = args.config
         outdir = args.out
 
         cmd_simu = f"python3.8 ./DASD/label_data.py {ipt} {configure_file} {outdir}"
@@ -166,20 +189,25 @@ if 'func' in args:
         test_data = args.test_data
         test_label = args.test_label
         target = args.target
+        M = args.M
+        save = args.save
         out = args.out
-        cmd_train = f"python3.8 ./DASD/DANN_train.py {train_data} {train_label} {valid_data} {valid_label} {test_data} {test_label} {target} {out}"
+        cmd_train = f"python3.8 ./DASD/DANN_train.py {train_data} {train_label} {valid_data} {valid_label} {test_data} {test_label} {target} {M} {save} {out}"
         subprocess.call(cmd_train,shell=True)
 
     elif args.func == 'pred':
         if args.model is None:
             parser_pred.print_help()
             sys.exit(1)
-        model = args.model
-        feature = args.feature
-        position = args.position
-        out = args.out
-        cmd_pred = f"python3.8 ./DASD/pred.py {model} {feature} {position} {out}"
-        subprocess.call(cmd_pred)
+        
+        model = convert_abs_path(args.model, DASD_directory)
+        feature = convert_abs_path(args.feature,DASD_directory)
+        position = convert_abs_path(args.position,DASD_directory)
+        out = convert_abs_path(args.out)
+
+        M = args.M
+        cmd_pred = f"python3.8 ./DASD/pred_ensemble.py {model} {M} {feature} {position} {out}"
+        subprocess.call(cmd_pred,shell=True)
 
 
 else:
