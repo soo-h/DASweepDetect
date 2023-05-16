@@ -1,15 +1,18 @@
-import numpy as np
 import sys
-from script_real_fev import readtools 
-from script_real_fev import write_real_fev
-import multiprocessing 
-from util import window_tools
+import multiprocessing
 import time
 import os
-from util.tools_feature import loadstastic
 import subprocess
 import warnings
 import copy
+
+import numpy as np
+
+from script_real_fev import readtools
+from script_real_fev import write_real_fev
+from util import window_tools
+from util.tools_feature import loadstastic
+
 warnings.filterwarnings("ignore")
 
 
@@ -129,10 +132,9 @@ def calc_stastic_real(file,coreNum,tolearance,start_position,end_position,window
     end_position = check_region_paramater(end_position)
     window_step = check_step(window_step,window_size)
 
-    ## 优化1，不需要全部读取
-    #snpMatrix,filtpos = readtools.vcf_to_matrix_pos(file)
+
     snpMatrix,filtpos = readtools.vcf_to_matrix_pos(file,start_position,end_position)
-    ##snpMatrix的shape：(varience,hap)
+
     window = window_tools.position_windows(filtpos,window_size, start=start_position,stop=end_position,step=window_step)
     win_loc = window_tools.window_loc(filtpos, window)
 
@@ -140,7 +142,7 @@ def calc_stastic_real(file,coreNum,tolearance,start_position,end_position,window
     posSet = [filtpos[loc[0]:loc[1]] for loc in win_loc if loc[1] - loc[0] >= tolearance]
     # 保存位置信息
     save_position(posSet,opt)
-    ## 统计量计算
+    # 统计量计算
     data_generator = real_data_generator(dataSet,posSet)
 
     sfs_ = multiprocessing.Process(target=write_real_fev.write_sfs, args=(data_generator, opt))
@@ -164,16 +166,16 @@ def get_featureMap(file,coreNum,tolearance,start_position,end_position,window_si
     opt = outdir + name
     _ = calc_stastic_real(file,coreNum,tolearance,start_position,end_position,window_size,window_step,opt)
     
-    ## 整理生成特征图
+    # 整理生成特征图
     featureNameSet = [outdir + caluc_name for caluc_name in os.listdir(outdir) if caluc_name.startswith(f'{name}_')]
     featureMap = loadstastic(copy.deepcopy(featureNameSet))
     
     #if not remain
-    ## 删除中间文件
+    # 删除中间文件
     cmd = 'rm -f ' + ' '.join(featureNameSet)
     subprocess.call(cmd,shell=True)
 
-    ## 保存特征图
+    # 保存特征图
     np.save(f'{opt}_featureMap',featureMap)
     return 0
 
@@ -187,7 +189,6 @@ if coreNum > core_one_process * fileNum:
     print(f'Warning: too much cpu!! Recommend {core_one_process * fileNum}')
 
 if coreNum > core_one_process:
-    ## 进程间并行,进程内并行
     process_Mcore_number = coreNum / core_one_process
     core_residue = coreNum % core_one_process
 
@@ -208,7 +209,6 @@ if coreNum > core_one_process:
         pre_run_number = int(process_Mcore_number - runing_number)
         
         if run == 1:
-            ## 用8个cpu执行进程
             for _ in range(pre_run_number):
                 file = next(file_iter)
                 if file == "finish0":
@@ -218,7 +218,7 @@ if coreNum > core_one_process:
                 p = multiprocessing.Process(target=get_featureMap, args=(file,core_one_process,tolearance,start_position,end_position,window_size,window_step,outdir))
                 p.start()
                 processSet.append(p)
-            ## 若无待运行进程，中止
+            # 中止
             if run == -1:
                 break
 
@@ -227,7 +227,7 @@ if coreNum > core_one_process:
             or not process_residu):
 
             file = next(file_iter)
-            ## 若无待运行进程，中止
+            #中止
             if file == "finish0":
                 break
             
@@ -235,6 +235,6 @@ if coreNum > core_one_process:
             process_residu.start()
 
 else:
-    ## 进程间串行
+    # 串行
     for file in nameSet:
         get_featureMap(file,coreNum,tolearance,start_position,end_position,window_size,window_step,outdir)

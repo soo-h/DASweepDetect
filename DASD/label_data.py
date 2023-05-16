@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from sklearn.model_selection import train_test_split
-from util.check_tools import get_input_file
+from util.check_tools import get_input_file,check_label_config
 import os
 
 
@@ -10,27 +10,25 @@ ipt = sys.argv[1]
 config = sys.argv[2]
 outdir = sys.argv[3]
 
-
+if os.path.isdir(outdir):
+    if not outdir.endswith('/'):
+        outdir = outdir + '/'
 
 featureMapSet = get_input_file(ipt)
 
-
-
-with open(config,'r') as f:
+def read_label_dict(config):
     lab_dict = {}
-    for line in f:
-        if line:
-            name,label = line.strip().split()
-            lab_dict[name] = int(label)
 
-if len(featureMapSet) != len(lab_dict.keys()):
-    print("Error: Feature map and label do not match!!!")
-    sys.exit()
+    with open(config,'r') as f:
+        for line in f:
+            if line:
+                name,label = line.strip().split()
+                lab_dict[name] = label
+    check_label_config(lab_dict)
+    return lab_dict
 
 def label_gene(clsName,lab_dict):
-    """
-    后期具体化name,通过查询字典直接返回label
-    """    
+
     query = False
     
     for name in lab_dict:
@@ -41,8 +39,7 @@ def label_gene(clsName,lab_dict):
         sys.exit('ClassName Error: Name not in dict !!!')
     return 0
 
-if len(lab_dict.keys()) != len(featureMapSet):
-    sys.exit("Error: Number of sample classify not compare with Number of label !!!")
+lab_dict = read_label_dict(config)
 
 dataSet = []
 dataLabel = []
