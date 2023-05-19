@@ -20,7 +20,7 @@
 # 2.**Installation**
 
 ```shell
-git clone https://github.com/soo-h/DASD
+git clone https://github.com/soo-h/DASweepDetect
 ```
 
 ## 2.1 python3.8 安装
