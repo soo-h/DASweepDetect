@@ -250,7 +250,7 @@ python3.8 DASD.py train --train-data trainSet/trainSet.npy --train-label trainSe
 
 
 
-## step6.Prediction
+## Prediction
 
 Use `pred` complete. Use this function to output selective sweep detection and classification results.
 
