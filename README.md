@@ -1,31 +1,43 @@
 
 
 # 1.**Introduction**
+# DASDC
 
-**DASDC** 是一个基于深度学习（域对抗网络）用于选择信号识别并分类的软件，其工作示意图如下：
-
-![image](https://github.com/soo-h/DASweepDetect/assets/74720083/1f471fde-3011-491f-a39b-69a04c832c96)
- <p align="center"><b>（DASDC工作示意图）</b></p>       
+# *Domain Adversarial Sweep Detection and Classification*
 
 
 
-软件以**单群体vcf文件**和**该群体的群体遗传学参数、群体历史为输入**，通过六个步骤，完成选择信号的识别和分类。
+# Contents
+
+- **OVERVIEW**
+- **GETTING STARTED**
+- **USAGE**
+- **OUTPUT**
+- **FAQ** 
 
 
 
-如果您发现软件有任何错误或问题，请联系   
+# **OVERVIEW**
 
-如果您使用此软件，请引用
+ `DASDC` is a software based on deep learning (domain adversarial networks) for selective sweep identification and classification. It outperforms traditional statistical methods in terms of performance and introduces an adversarial learning module to extract useful invariant representations between simulated and real data. As a result, `DASDC` demonstrates higher generalization in the detection and classification of selective sweep in real genomic data.
 
-# 2.**Installation**
+`DASDC` only supports selection signal analysis for a single population. With input of a **single population `VCF` file** and **`population genetic parameters` and `Demographic` of the population**, the software performs six steps to accomplish the identification and classification of selective sweep.
 
-```shell
-git clone https://github.com/soo-h/DASweepDetect
-```
+![image](https://github.com/soo-h/DASweepDetect/assets/74720083/a1205262-6a17-4ec3-84fb-5e82bb92ca4c)
+ <p align="center"><b>（DASDC work diagram）</b></p>
 
-## 2.1 python3.8 安装
 
-软件目前需使用python 3.8版本及以上版本运行，install python on the command line enter:
+If you identify any bugs or issues with the software, then please contact  to report the issue.
+
+If you use this software, then please cite it as
+
+# **GETTING STARTED**
+
+**Note: **`DASDC` was developed based on Python 3.8. Due to the use of certain features specific to Python 3.8, it currently requires Python 3.8 or higher to run. In the future, optimizations will be made to ensure compatibility with other versions of Python 3.
+
+1.python3.8 instsall
+
+install python on the command line enter:
 
 ```shell
 wget https://www.python.org/ftp/python/3.8.6/Python-3.8.6.tgz
@@ -38,50 +50,50 @@ make
 make install
 ```
 
-$PATH是python安装的路径
+$PATH is installation path of python
 
 
 
-## 2.2 创建虚拟环境（非必须）
+2.Create virtual environment（Not necessary）
 
-**建议：创建虚拟环境**
+**Suggestion: Create a virtual environment**
 
 
    ```shell
-python -m venv my_project_env  # 创建虚拟环境
-source my_project_env/bin/activate  # 激活虚拟环境
+python -m venv my_project_env  # create virtual environment
+source my_project_env/bin/activate  # activate virtual environment
    ```
 
-命令1为 创建虚拟环境，命令2为激活所创建的虚拟环境。
 
-## 2.3 依赖包安装
 
-使用以下命令完成软件依赖的第三方库的安装
+3.Software and dependency package installation
+
+```shell
+git clone https://github.com/soo-h/DASweepDetect
+```
+
+Run the following command to install the third-party libraries that the software depends on
 
 ```shell
 pip3.8 install -r require.txt
 ```
 
 
+# USAGE
 
-# 3.使用
-
-- step1. 数据模拟（详见3.1）
-- step2. 模拟数据特征工程（详见3.2）
-- step3. 真实基因组数据特征工程（详见3.3）
-- step4. 标注（详见3.4）
-- step5. 模型训练（详见3.5）
-- step6. 预测（详见3.6）
-
+- step1. Data simulation (details see 3.1)
+- step2. Simulation data feature engineering（details see 3.2）
+- step3. Real genome data feature engineering（details see 3.3）
+- step4. Data annotation（details see 3.4）
+- step5. Model training（details see 3.5）
+- step6. Predict（details see 3.6）
 
 
-## 3.1.数据模拟
 
-**Note：**数据模拟通过**discoal**软件完成，我们将编译后的**discoal**二进制包放入代码仓库。若需重新编译，通过下方链接下载后重新编译：
+## step1.Data simulation
+We put the compiled binary package of `discoal` into the code repository and complete the data simulation by calling `discoal ` software. If you need to recompile, download it from the link below and recompile it:
 
 https://github.com/kr-colab/discoal
-
-
 
 Citations
 
@@ -89,33 +101,31 @@ Citations
 
 
 
-### 3.1.1.模拟命令
+### <1>Command
 
-使用**simu** 功能完成
+Use the `simu` function to complete.
 
-以配置文件或仅包含配置文件的文件夹为输入，若传入多个配置文件，文件间应用”，“分割。输出为基于配置文件内参数生成的模拟数据。
+Input a configuration file or a folder containing only configuration files. If multiple configuration files are input, apply split files by  `,` . The output is simulated data generated based on the parameters in the configuration file.
 
-配置文件应命名为"\<name\>\_"configure.txt，输出的模拟数据为 "\<name\>\_simulation"。其中，\<name\>为用户自定义文件名。
+The configuration file should be named "\<name\>\_"configure.txt and the output simulation data should be "\<name\>\_simulation". \<name\> is the file name defined by the user.
 
+**Parameter description：**
 
+**-i :** The path of input folder or file
 
-**参数说明：**
-
-使用 **-i** 参数传入文件夹或文件的路径
-
-使用 **-o** 参数设置输出文件夹路径
+**-o :** The path of output folder or file
 
 
 
-**示例:**
+**Demo:**
 
-- 以仅包含配置文件的文件夹为输入：基于simu 文件夹下的配置文件进行数据模拟，并存储于simu_data文件夹下。
+- Take a folder which containing only configuration files as input: Data is simulated based on configuration files in the simu folder and stored output in the simu_data folder.
 
 ```shell
 python3.8 DASD.py simu -i simu_config/ -o simu_data
 ```
 
-- 以配置文件为输入：
+- Take the configuration file as input：
 
 ```shell
 python3.8 DASD.py simu -i simu_config/chSel_configure.txt -o simu_data
@@ -123,44 +133,38 @@ python3.8 DASD.py simu -i simu_config/chSel_configure.txt -o simu_data
 
 
 
+### <2>Configuration file description of simulation data 
 
-### 3.1.2.模拟数据配置文件说明
+Configuration files can be found in the DASD/simu_config folder, which contains five types of configuration files: hard sweep; hard linkage sweep; soft sweep; soft linkage sweep and neutral. Each type of configuration file corresponds to one configuration file. Configuration parameters to consider include:
 
+- rep：Simulation times (Default is 2500, which means 2500 simulations are performed and 2500 sets of selective sweep simulation data are generated)
+- hap：Chromosome numbers contained in the population genome (Default is 100)
+- len：Length of chromosome fragments (Default is 100kbp, maximum length of discoal software is 220kbp, if you need to simulate longer fragments, you need to recompile discoal software. See 3.1)
+- Pt：The value range of mutation rate, consisting of upper and lower limit values, needs to be provided by the user.
+- Pr：The value range of recombination rate, consisting of upper and lower limit values, needs to be provided by the user.
+- Pu：The value of  the selection end time and sampling time (Default is 0.0005982817348574893 0).
+- Pa：The value range of coefficience of selection , consisting of upper and lower limit values, needs to be provided by the user.
+- Px：The region where the selective site occurs (default is 0.475 0.525, that is, the selected site is within 0.475 to 0.525 of the fragment)
+- Pxx：Use this paramater when the selected sites are not contiguous. (Default is  (0-0.475 0.525-1)).
+- en：Demographic parameters need to be provided by the user. The format is **en t 0 N~~t~~/N~~a~~**, where **t** represents the backward tracing time, **N~~t~~** represents the group size at time **t**, and **N~~a~~** represents the group size at the current time. By using multiple en parameters, the representation of group history (N varying with t) can be achieved.
 
-配置文件见DASD/simu_config 文件夹下，包含经典选择性扫除、与经典选择性扫除连锁、温和选择性扫除、与温和选择性扫除连锁、中性 5个类别的配置文件，每个类别数据对应一个配置文件。需考虑的配置参数包含：
+The first column of the configuration file represents the parameters used, and the subsequent columns represent the parameter values. Columns are separated by spaces or tabs. For the en parameter, since there are often multiple values, each en parameter is arranged on a separate line.
 
-- rep：模拟次数（默认为2500，表示进行2500次模拟，生成2500组选择信号模拟数据）
-- hap：染色体条数（默认为100）
-- len：染色体片段长度（默认为100kbp，discoal软件最大长度为220kbp，若需模拟更长的片段，需重新编译discoal软件。见3.1 ）
-- Pt：突变率取值范围，由上限和下限两个数值组成，需用户提供。
-- Pr：重组率取值范围，由上限和下限两个数值组成，需用户提供。
-- Pu：选择结束时间和抽样时间的间隔（默认为0.0005982817348574893 0）
-- Pa：选择强度取值范围，由上限和下限两个数值组成，需用户提供。
-- Px：受选择位点发生区域（默认为0.475 0.525，即，受选择位点位于片段的0.475-0.525内）
-- Pxx：受选择位点不连续，使用该参数，默认为（0-0.475 0.525-1）
-- en：群体历史参数，需用户提供。格式为 **en  t  0  N~t~/N~a~**，其中，t为向前回溯的时间，N~t~ 为 在t 时间的群体规模，N~a~ 为当前时间的群体规模。通过使用多个en参数完成对群体历史的表征（N随t的变化）。
+## step2.Simulation data feature engineering
 
-配置文件第一列为所使用参数，后续列为参数值，列之间以空格或制表符分割。对于en 参数，由于往往具有多个，每个 en 参数为一行进行排列。
+Use `calc_domain`  to convert simulated data into feature matrix.
 
+**Parameter description**
 
+- **-i** or **--input**：path to the folder where the simulated data file is located, or one or more simulation data files (with`,`as the separator)
+- **-o** 或 **--out**：the path of output folder or file
 
-## 3.2.模拟数据特征工程
+**Optional parameter**
 
-使用**calc_domain**功能完成，实现将模拟数据转化为特征矩阵。
+- **--filter** : the criterion for rejecting samples rejecting samples with less than n SNPs. Default is 250.
+- **--core** : the number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8. n is the number of input files (or files in a folder). Default value is 16.
 
-**参数说明：**
-
-- **-i** 或 **--input**：模拟数据文件所在文件夹，或单个或多个模拟数据文件（以','为分割符）
-- **-o** 或 **--out**：输出文件夹
-
-**可选参数：**
-
-- **--filter** : 设置剔除样本的标准，即剔除SNP少于250的样本，默认为250
-- **--core** : 设置使用CPU数，建议使用8的倍数，且不应超过n*8，n为传入的文件数(或文件夹内的文件数)，默认为16
-
-
-
-**示例:** 将simu_data下模拟数据转化为特征矩阵，并存储于simu_feature文件夹下。
+**Demo:** Convert the simulated data under the folder of simu_data into feature matrix and store it in the simu_feature folder.
 
 ```shell
 python3.8 DASD.py calc_domain -i simu_data --filter 250 --core 16 -o simu_feature
@@ -168,25 +172,23 @@ python3.8 DASD.py calc_domain -i simu_data --filter 250 --core 16 -o simu_featur
 
 
 
-## 3.3. 真实数据特征工程
+## step3. Real data feature engineering
 
-使用**calc_target** 功能完成，与3.2部分传入参数相同，用于将真实基因组数据转化为特征矩阵。
+Use the `calc_target` function to convert the real genome data into the feature matrix. which is the same as the passed parameter in step2.
 
-**参数说明：**
+**Parameter description：**
 
-- **-i** 或 **--input**：模拟数据文件所在文件夹，或单个或多个模拟数据文件（以','为分割符）
-- **-o** 或 **--out**：输出文件夹
+- **-i** or **--input**：Path to the folder where the simulated data file is located, or one or more simulation data files (with `,` as the separator)
+- **-o** or **--out**：the path of output folder or file
 
-**可选参数：**
+**Optional parameter：**
 
-- **--filter** : 设置剔除样本的标准，即剔除SNP少于250的样本，默认为250
-- **--core** : 设置使用CPU数，建议使用8的倍数，且不应超过n*8，n为传入的文件数(或文件夹内的文件数)，默认为16
-- **--start** ： 若仅对染色体部分片段转化为特征图，通过设定该参数，指定转换的起始位置，默认为None
-- **--end**：通过设定该参数，指定转换的终止位置，默认为None
+- **--filter** : The criterion for rejecting samples rejecting samples with less than n SNPs. Default is 250.
+- **--core** : The number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8. n is the number of input files (or files in a folder). Default value is 16.
+- **--start** ： use this parameter to convert part of the chromosome  to a feature map,need provide the start position. Default position is None.
+- **--end**：use this parameter to convert part of the chromosome  to a feature map,need provide the end position. Default position is None
 
-
-
-**示例:**将real_data下模拟数据转化为特征矩阵，并存储于real_feature文件夹下。
+**Demo:**  Convert the simulated data under the "real_data" folder into feature matrix and store them in the "real_feature" folder.
 
 ```shell
 python3.8 DASD.py calc_domain -i real_data --filter 250 --core 16 -o real_feature
@@ -194,19 +196,19 @@ python3.8 DASD.py calc_domain -i real_data --filter 250 --core 16 -o real_featur
 
 
 
-## 3.4. 数据标注
+## step4. Data annotation
 
-使用**data_annotation**完成，根据用户提供的配置文件构建用于模型训练的数据集。
+use `data_annotation` complete，which constructing a dataset for model training based on the configuration file provided by the user.
 
-**参数说明：**
+**Parameter description：**
 
-- **-i** 或 **--input**：模拟数据特征矩阵文件所在文件夹，或单个或多个模拟数据特征矩阵文件（以','为分割符）（即，3.2输出结果）
-- **--config** : 配置文件，包含标注信息
-- **-o** 或 **--out**：输出文件夹，用于存储输出的模型训练数据集
+- **-i** or **--input**：path of folder which contain the simulated data feature matrix files, or a single or multiple simulated data feature matrix files (separated by `,`) (i.e., output results from step 2).
+- **--config** : path of configure file，which contain annotation infomation.
+- **-o** or **--out**：path of output folder which store the generated model training dataset.
 
 
 
-**示例：**根据用户提供的配置文件，使用simu_feature下的特征矩阵构建训练数据集。生成的数据集存储于trainSet文件夹下。
+**Demo：** Using the feature matrix under the "simu_feature" folder, construct a training dataset based on the configuration file provided by the user. The generated dataset will be stored in the "trainSet" folder.
 
 ```shell
 python3.8 DASD.py data_annotation -i simu_feature --config label_configure.txt -o trainSet
@@ -214,36 +216,36 @@ python3.8 DASD.py data_annotation -i simu_feature --config label_configure.txt -
 
 
 
-**配置文件说明：**
+**Configuration file description：**
 
-配置文件见DASD/label_configure.txt，由两列构成，第一列为用户在3.1.2中自定义的配置文件的\<name\> ， 第二列为该类别对应的标签。
+The configuration file can be found at DASD/label_configure.txt, which consists of two columns. The first column represents the <name> of the custom configuration file specified by the user in step1, and the second column represents the corresponding label for that class.
 
-Note：标签使用连续的整数型数字，且应从0开始。即，若包含n类数据(假设n > 1)，则标签应由 0 ，1 ，,,,，n构成。
+**Note:** The labels are represented by consecutive integers starting from 0. If there are n classes of data (assuming n > 1), the labels should range from 0 to n-1.
 
-## 3.5.模型训练
+## step5.Model training
 
-使用**train**完成
+Use `train` complete.   This function use for model training.
 
-**参数说明：**
+**Parameter description：**
 
-- **--train-data** : 训练集数据所在路径
-- **--train-label** : 训练集标签所在路径
-- **--valid-data** : 验证集数据所在路径
-- **--valid-label**: 验证集标签所在路径
-- **--test-data** ：测试集数据所在路径
-- **--test-label** ： 测试集标签所在路径
-- **-t**或 **--target** ： 目标域数据集所在路径
-- **-o**或 **--out** ： 模型输出文件夹所在路径
+- **--train-data** : Path of the training dataset.
+- **--train-label** : Path of the training label.
+- **--valid-data** : Path of the valid dataset.
+- **--valid-label**: Path of the valid label.
+- **--test-data** ：Path of the test dataset.
+- **--test-label** ： Path of the test label.
+- **-t** or **--target** ：  Path of the domain of target dataset.
+- **-o** or **--out** ： Path of the output folder for the model.
 
-**可选参数：**
+**Optional parameter**
 
-**-a** 或 **--all** : 0 或1，0表示仅输出最优模型，1表示输出迭代过程生成的所有模型。默认为0
+**-a** or **--all** : 0 or 1, where 0 indicates outputting only the best model and 1 indicates outputting all models generated during iterations. Default value is 0.
 
-**-M**： 子模型的个数，推荐使用5，默认为5。
+**-M**： The number of sub-models. It is recommended to use 5. Default value is 5.
 
 
 
-**demo:** 传入训练、验证、测试数据集及真实数据特征矩阵，将训练完成后的模型输出至Ensemble_CEU 文件夹下。
+**Demo:** Input the training, validation, and testing datasets, along with the real data feature matrix, and output the trained model to the "Ensemble_CEU" folder.
 
 ```shell
 python3.8 DASD.py train --train-data trainSet/trainSet.npy --train-label trainSet/trainSet_label.npy --valid-data trainSet/validSet.npy --valid-label trainSet/validSet_label.npy --test-data trainSet/testSet.npy --test-label trainSet/testSet_label.npy -t real_feature/ -o ../Ensemble_CEU
@@ -251,21 +253,21 @@ python3.8 DASD.py train --train-data trainSet/trainSet.npy --train-label trainSe
 
 
 
-## 3.6.预测
+## step6.Prediction
 
-使用**pred**完成
+Use `pred` complete. Use this function to output selective sweep detection and classification results.
 
-**参数说明**
+**Parameter description**
 
-- **-m** 或 **--model**: 模型所在路径
-- **-M** : 子模型个数，应与3.5中指定M一致，默认为5
-- **-f** 或 **--feature**: 待预测数据特征矩阵所在路径（3.3输出结果，以 vcf_featureMap.npy 结尾的文件）
-- **-p** 或 **--position**: 待预测数据对应的位置信息（3.3输出结果以 vcfposInfo 结尾的文件）
-- **-o** 或 **--out** ： 预测结果
+- **-m** or **--model**: Path of model.
+- **-M** : The number of sub-model,should consistent with the provided number of sub-models. Default is 5.
+- **-f** or **--feature**: Path of the feature matrix for the data to be predicted.（the output of step3 ，ending with "vcf_featureMap.npy"）
+- **-p** or **--position**: Path of the position information for the data to be predicted.（the output of step3 , ending with " vcfposInfo "）
+- **-o** or **--out** ： Path of pred result.
 
 
 
-**示例：** 对CEU.chr2.vcf_featureMap.npy（CEU群体2号染色体）进行预测
+**Demo:** Perform prediction on CEU.chr2.vcf_featureMap.npy (Chromosome 2 of CEU population).
 
 ```shell
 python3.8 DASD.py pred -m ../Ensemble_CEU_ensemble/ -M 5 -f real_feature/CEU.chr2.vcf_featureMap.npy -p real_feature/CEU.chr2.vcfposInfo -o pred_res/CEU.chr2.pred.txt
@@ -273,15 +275,17 @@ python3.8 DASD.py pred -m ../Ensemble_CEU_ensemble/ -M 5 -f real_feature/CEU.chr
 
 
 
-# 4.输出结果说明
+# OUTPUT
 
-以 CEU.chr2.vcf_featureMap.npy 的输出结果为例：
+Taking the output results of CEU.chr2.vcf_featureMap.npy as example :
 
 ![image](https://github.com/soo-h/DASweepDetect/assets/74720083/8b4670b6-0961-4073-a8b7-c5df89613e8e)
 
- <p align="center"><b>（输出文件）</b></p>
+ <p align="center"><b>（output file）</b></p>
 
-第一列为判定区域的左端点，第二列为判定区域的右端点。第三列为判别类型，第四列为预测概率，第五列为分别预测为五个类别的概率。
+The first column represents the left endpoint of the predicted region. The second column represents the right endpoint of the predicted region. The third column represents the classification type. The fourth column represents the predicted probability. The fifth column represents the probability of being predicted for each of the five categories.
 
-以第一行为例，460kbp-560kbp该区域被判定为未受到选择（DASD/label_configure.txt 中，标签 4 对应中性类）。
+Taking the first row as an example, the region from 460kbp to 560kbp is determined to be neutral class (according to the label 4 in label_configure.txt).
+
+# FAQ
 
