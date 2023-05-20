@@ -1,13 +1,10 @@
-
-
-# 1.**Introduction**
 # DASDC
 
-# *Domain Adversarial Sweep Detection and Classification*
+## *Domain Adversarial Sweep Detection and Classification*
 
 
 
-# Contents
+## Contents
 
 - **OVERVIEW**
 - **GETTING STARTED**
@@ -81,16 +78,16 @@ pip3.8 install -r require.txt
 
 # USAGE
 
-- step1. Data simulation (details see 3.1)
-- step2. Simulation data feature engineering（details see 3.2）
-- step3. Real genome data feature engineering（details see 3.3）
-- step4. Data annotation（details see 3.4）
-- step5. Model training（details see 3.5）
-- step6. Predict（details see 3.6）
+- step1. Data simulation
+- step2. Simulation data feature engineering
+- step3. Real genome data feature engineering
+- step4. Data annotation
+- step5. Model training
+- step6. Predict
 
 
 
-## step1.Data simulation
+## Data simulation
 We put the compiled binary package of `discoal` into the code repository and complete the data simulation by calling `discoal ` software. If you need to recompile, download it from the link below and recompile it:
 
 https://github.com/kr-colab/discoal
@@ -150,7 +147,7 @@ Configuration files can be found in the DASD/simu_config folder, which contains 
 
 The first column of the configuration file represents the parameters used, and the subsequent columns represent the parameter values. Columns are separated by spaces or tabs. For the en parameter, since there are often multiple values, each en parameter is arranged on a separate line.
 
-## step2.Simulation data feature engineering
+## Simulation data feature engineering
 
 Use `calc_domain`  to convert simulated data into feature matrix.
 
@@ -172,7 +169,7 @@ python3.8 DASD.py calc_domain -i simu_data --filter 250 --core 16 -o simu_featur
 
 
 
-## step3. Real data feature engineering
+## Real data feature engineering
 
 Use the `calc_target` function to convert the real genome data into the feature matrix. which is the same as the passed parameter in step2.
 
@@ -196,7 +193,7 @@ python3.8 DASD.py calc_domain -i real_data --filter 250 --core 16 -o real_featur
 
 
 
-## step4. Data annotation
+## Data annotation
 
 use `data_annotation` complete，which constructing a dataset for model training based on the configuration file provided by the user.
 
@@ -222,7 +219,7 @@ The configuration file can be found at DASD/label_configure.txt, which consists 
 
 **Note:** The labels are represented by consecutive integers starting from 0. If there are n classes of data (assuming n > 1), the labels should range from 0 to n-1.
 
-## step5.Model training
+## Model training
 
 Use `train` complete.   This function use for model training.
 
