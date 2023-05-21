@@ -74,7 +74,15 @@ Run the following command to install the third-party libraries that the software
 ```shell
 pip3.8 install -r require.txt
 ```
+Set executable permissions for `discoal`:
 
+```shell
+chmod 755 discoal
+```
+
+
+
+# USAGE
 
 # USAGE
 
