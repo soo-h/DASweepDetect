@@ -183,7 +183,7 @@ Use the `calc_target` function to convert the real genome data into the feature 
 
 **Parameter description：**
 
-- **-i** or **--input**：Path to the folder where the simulated data file is located, or one or more simulation data files (with `,` as the separator)
+- **-i** or **--input**：Path to the folder where the  real data file is located, or one or more simulation data files (with `,` as the separator)
 - **-o** or **--out**：the path of output folder or file
 
 **Optional parameter：**
@@ -196,7 +196,7 @@ Use the `calc_target` function to convert the real genome data into the feature 
 **Demo:**  Convert the simulated data under the "real_data" folder into feature matrix and store them in the "real_feature" folder.
 
 ```shell
-python3.8 DASD.py calc_domain -i real_data --filter 250 --core 16 -o real_feature
+python3.8 DASD.py calc_target -i real_data --filter 250 --core 16 -o real_feature
 ```
 
 
