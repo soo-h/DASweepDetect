@@ -2,7 +2,15 @@
 
 ## *Domain Adversarial Sweep Detection and Classification*
 
+### **_Note：The software is still being updated._**
 
+**_The following contents will be added later:_ ** 
+
+_<1>detailed population genetic parameters steps;_
+
+_<2>models that can be used for detection and classification of specific selective sweep;_
+
+_<3>detailed explanation of model output results and visualization scripts._
 
 ## Contents
 
@@ -81,8 +89,6 @@ chmod 755 discoal
 ```
 
 
-
-# USAGE
 
 # USAGE
 
@@ -189,6 +195,9 @@ Use the `calc_target` function to convert the real genome data into the feature 
 **Optional parameter：**
 
 - **--filter** : The criterion for rejecting samples rejecting samples with less than n SNPs. Default is 250.
+- **--window-size** : The windows size of convert feature map. Default=100000
+- **--window-step** : The step of windows. Default=None
+
 - **--core** : The number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8. n is the number of input files (or files in a folder). Default value is 16.
 - **--start** ： use this parameter to convert part of the chromosome  to a feature map,need provide the start position. Default position is None.
 - **--end**：use this parameter to convert part of the chromosome  to a feature map,need provide the end position. Default position is None
@@ -291,6 +300,46 @@ Taking the output results of CEU.chr2.vcf_featureMap.npy as example :
 The first column represents the left endpoint of the predicted region. The second column represents the right endpoint of the predicted region. The third column represents the classification type. The fourth column represents the predicted probability. The fifth column represents the probability of being predicted for each of the five categories.
 
 Taking the first row as an example, the region from 460kbp to 560kbp is determined to be neutral class (according to the label 4 in label_configure.txt).
+
+
+
+# AVAILABLE MODELS
+
+We put some models trained for specific species and groups in `available_models` folder,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep (call USAGE-Prediction).
+
+## Homo sapiens
+
+### <1>CEU Model
+
+**Description:** Model for detection and classification selective sweep of CEU population.
+
+**Location:** available_models/Homo_sapiens/CEU
+
+**Citations:**
+
+
+
+## Sus scrofa domestica
+
+### <1> LW Model
+
+**Description:** Model for detection and classification selective sweep of CEU population.
+
+**Location:** available_models/Sus_scrofa/LW
+
+**Citations:**
+
+## Anopheles gambiae
+
+### <1> BFS Model
+
+**Description:** Model for detection and classification selective sweep of CEU population.
+
+**Location:** available_models/Anopheles_gambiae/BFS
+
+**Citations:**
+
+
 
 # FAQ
 
