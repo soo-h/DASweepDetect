@@ -4,7 +4,7 @@
 
 ### **_Note：The software is still being updated._**
 
-**_The following contents will be added later:_ ** 
+**_The following contents will be added later:_** 
 
 _<1>detailed population genetic parameters steps;_
 
