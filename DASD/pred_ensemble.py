@@ -18,8 +18,10 @@ def max_minNorm(data):
 
 def get_mid_positions(left,right):
     length = right - left
-    mid1 = left + length * 9/20
-    mid2 = left + length * 11/20
+    mid1 = int(left + length * 19/40)
+    mid2 = int(left + length * 21/40)
+    #mid1 = left + length * 9/20
+    #mid2 = left + length * 11/20
     return mid1, mid2
 def read_pos_info(pos_info):
     region = []
