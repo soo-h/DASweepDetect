@@ -138,11 +138,17 @@ def calc_stastic_real(file,coreNum,tolearance,start_position,end_position,window
     window = window_tools.position_windows(filtpos,window_size, start=start_position,stop=end_position,step=window_step)
     win_loc = window_tools.window_loc(filtpos, window)
 
-    dataSet = [snpMatrix[loc[0] : loc[1]].T for loc in win_loc if loc[1] - loc[0] >= tolearance]
+
     posSet = [filtpos[loc[0]:loc[1]] for loc in win_loc if loc[1] - loc[0] >= tolearance]
-    # 保存位置信息
+
+    # check snp density
+    if len(posSet) == 0:
+        sys.exit("Error: All segments are filtered, try increasing the parameter of --window-size!!!")
+
+    dataSet = [snpMatrix[loc[0] : loc[1]].T for loc in win_loc if loc[1] - loc[0] >= tolearance]
+    # save pos information
     save_position(posSet,opt)
-    # 统计量计算
+    # statistic calculation
     data_generator = real_data_generator(dataSet,posSet)
 
     sfs_ = multiprocessing.Process(target=write_real_fev.write_sfs, args=(data_generator, opt))
