@@ -99,7 +99,7 @@ chmod 755 discoal
 - step5. Model training
 - step6. Predict
 
-
+**Note: example files can be downloaded from https://data.mendeley.com/datasets/vdg2nbpc4j**
 
 ## Data simulation
 We put the compiled binary package of `discoal` into the code repository and complete the data simulation by calling `discoal ` software. If you need to recompile, download it from the link below and recompile it:
