@@ -128,7 +128,7 @@ if 'func' in args:
         opt_file = convert_abs_path(args.out)
         script = convert_abs_path('DASD/simudata_gen.py',DASD_directory)
         discoal_path = convert_abs_path('discoal',DASD_directory)
-        cmd_simu = f"python3 {script} {configure_file} {opt_file} {discoal_path}"
+        cmd_simu = f"python3.8 {script} {configure_file} {opt_file} {discoal_path}"
         subprocess.call(cmd_simu,shell=True)
 
 
@@ -145,7 +145,7 @@ if 'func' in args:
 
         script = convert_abs_path('DASD/imudata_to_feature.py ', DASD_directory)
 
-        cmd_calcsimu = f"python3 {script} {ipt} {core} {filter} {outdir}"
+        cmd_calcsimu = f"python3.8 {script} {ipt} {core} {filter} {outdir}"
         subprocess.call(cmd_calcsimu,shell=True)
 
 
@@ -165,7 +165,7 @@ if 'func' in args:
 
         script = convert_abs_path('DASD/vcf_to_featureMap.py ', DASD_directory)
         
-        cmd_calcsimu = f"python3 {script} {ipt} {core} {filter} {start} {end} {size} {step} {outdir}"
+        cmd_calcsimu = f"python3.8 {script} {ipt} {core} {filter} {start} {end} {size} {step} {outdir}"
         print(cmd_calcsimu)
         subprocess.call(cmd_calcsimu,shell=True)
 
@@ -180,7 +180,7 @@ if 'func' in args:
 
         script = convert_abs_path('DASD/label_data.py ', DASD_directory)
 
-        cmd_simu = f"python3 {script} {ipt} {configure_file} {outdir}"
+        cmd_simu = f"python3.8 {script} {ipt} {configure_file} {outdir}"
         subprocess.call(cmd_simu,shell=True)
 
     elif args.func == 'train':
@@ -201,7 +201,7 @@ if 'func' in args:
 
         script = convert_abs_path('DASD/DANN_train.py ', DASD_directory)
 
-        cmd_train = f"python3 {script} {train_data} {train_label} {valid_data} {valid_label} {test_data} {test_label} {target} {M} {save} {out}"
+        cmd_train = f"python3.8 {script} {train_data} {train_label} {valid_data} {valid_label} {test_data} {test_label} {target} {M} {save} {out}"
         subprocess.call(cmd_train,shell=True)
 
     elif args.func == 'pred':
@@ -217,7 +217,7 @@ if 'func' in args:
 
         script = convert_abs_path('DASD/pred_ensemble.py ', DASD_directory)
 
-        cmd_pred = f"python3 {script} {model} {M} {feature} {position} {out}"
+        cmd_pred = f"python3.8 {script} {model} {M} {feature} {position} {out}"
         subprocess.call(cmd_pred,shell=True)
 
 
