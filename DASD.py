@@ -196,7 +196,7 @@ if 'func' in args:
         test_label = convert_abs_path(args.test_label)
         target = convert_abs_path(args.target)
         M = args.M
-        save = convert_abs_path(args.save)
+        save = args.save
         out = convert_abs_path(args.out)
 
         script = convert_abs_path('DASD/DANN_train.py ', DASD_directory)
