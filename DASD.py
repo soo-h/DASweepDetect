@@ -139,11 +139,11 @@ if 'func' in args:
             parser_calc_simu.print_help()
             sys.exit(1)
         ipt = convert_abs_path(args.input)
-        filter = convert_abs_path(args.filter)
+        filter = args.filter
         core = args.core
         outdir = convert_abs_path(args.out)
 
-        script = convert_abs_path('DASD/imudata_to_feature.py ', DASD_directory)
+        script = convert_abs_path('DASD/simudata_to_feature.py ', DASD_directory)
 
         cmd_calcsimu = f"python3.8 {script} {ipt} {core} {filter} {outdir}"
         subprocess.call(cmd_calcsimu,shell=True)
