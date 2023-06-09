@@ -8,7 +8,7 @@
 
 _<1>detailed population genetic parameters steps;_
 
-_<2>models that can be used for detection and classification of specific selective sweep;_
+_<2>models that can be utlized for detecting and classifying selective sweep in specific population;_
 
 _<3>detailed explanation of model output results and visualization scripts._
 
@@ -38,7 +38,7 @@ If you use this software, then please cite it as
 
 # **GETTING STARTED**
 
-**Note: **`DASDC` was developed based on Python 3.8. Due to the use of certain features specific to Python 3.8, it currently requires Python 3.8 or higher to run. In the future, optimizations will be made to ensure compatibility with other versions of Python 3.
+**Note:**`DASDC` was developed based on Python 3.8. Due to the use of certain features specific to Python 3.8, it currently requires Python 3.8 or higher to run. In the future, optimizations will be made to ensure compatibility with other versions of Python 3.
 
 1.python3.8 instsall
 
@@ -168,7 +168,7 @@ Use `calc_domain`  to convert simulated data into feature matrix.
 **Parameter description**
 
 - **-i** or **--input**：path to the folder where the simulated data file is located, or one or more simulation data files (with`,`as the separator)
-- **-o** 或 **--out**：the path of output folder or file
+- **-o** or **--out**：the path of output folder or file
 
 **Optional parameter**
 
@@ -323,7 +323,7 @@ We put some models trained for specific species and groups in `available_models`
 
 ### <1> LW Model
 
-**Description:** Model for detection and classification selective sweep of CEU population.
+**Description:** Model for detection and classification selective sweep of LW population.
 
 **Location:** available_models/Sus_scrofa/LW
 
@@ -333,7 +333,7 @@ We put some models trained for specific species and groups in `available_models`
 
 ### <1> BFS Model
 
-**Description:** Model for detection and classification selective sweep of CEU population.
+**Description:** Model for detection and classification selective sweep of BFS population.
 
 **Location:** available_models/Anopheles_gambiae/BFS
 
