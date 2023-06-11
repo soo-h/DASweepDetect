@@ -6,11 +6,9 @@
 
 **_The following contents will be added later:_**
 
-_<1>detailed population genetic parameters steps;_
+_<1>models that can be utlized for detecting and classifying selective sweep in specific population;_
 
-_<2>models that can be utlized for detecting and classifying selective sweep in specific population;_
-
-_<3>detailed explanation of model output results and visualization scripts._
+_<2>detailed explanation of model output results and visualization scripts._
 
 ## Contents
 
@@ -92,6 +90,8 @@ chmod 755 discoal
 
 # USAGE
 
+The identification and classification of the selective sweep is completed by performing the following 6 steps in sequence:
+
 - step1. Data simulation
 - step2. Simulation data feature engineering
 - step3. Real genome data feature engineering
@@ -102,6 +102,8 @@ chmod 755 discoal
 **Note: example files can be downloaded from https://data.mendeley.com/datasets/vdg2nbpc4j**
 
 ## Data simulation
+Use `simu` function to generate  simulation data based on real genome data.
+
 We put the compiled binary package of `discoal` into the code repository and complete the data simulation by calling `discoal ` software. If you need to recompile, download it from the link below and recompile it:
 
 https://github.com/kr-colab/discoal
@@ -113,8 +115,6 @@ Citations
 
 
 ### <1>Command
-
-Use the `simu` function to complete.
 
 Input a configuration file or a folder containing only configuration files. If multiple configuration files are input, apply split files by  `,` . The output is simulated data generated based on the parameters in the configuration file.
 
@@ -160,6 +160,10 @@ Configuration files can be found in the DASD/simu_config folder, which contains 
 - en：Demographic parameters need to be provided by the user. The format is **en t 0 N~~t~~/N~~a~~**, where **t** represents the backward tracing time, **N~~t~~** represents the group size at time **t**, and **N~~a~~** represents the group size at the current time. By using multiple en parameters, the representation of group history (N varying with t) can be achieved.
 
 The first column of the configuration file represents the parameters used, and the subsequent columns represent the parameter values. Columns are separated by spaces or tabs. For the en parameter, since there are often multiple values, each en parameter is arranged on a separate line.
+
+**How to set parameters see：DASweepDetect/Parameter_Inference.md at main · soo-h/DASweepDetect (github.com)](https://github.com/soo-h/DASweepDetect/blob/main/Parameter_Inference.md)**
+
+
 
 ## Simulation data feature engineering
 
@@ -305,13 +309,42 @@ Taking the first row as an example, the region from 460kbp to 560kbp is determin
 
 # AVAILABLE MODELS
 
-We put some models trained for specific species and groups in `available_models` folder,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep (call USAGE-Prediction).
+We put some models trained for specific species and groups in `available_models` folder,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
+
+**This process is done in the following two steps:**
+
+- step1: Real data feature engineering (detail see USAGE: Real data feature engineering)
+
+The input is folder which constitute of contains only one chromosome VCF format files.  If genome-wide data is used, it needs to be split into multiple files by chromosome.
+
+- step2: Prediction (detail see USAGE: Prediction)
+
+Make predictions about the feature of one chromosome. If predict genome-wide data,it needs to predict chromosome feature separately.
+
+**Demo:**
+
+step1:
+
+```python
+python3.8 DASD.py calc_target -i real_data --filter 250 --core 16 -o real_feature
+```
+real_data is folder which contain input data of VCF format; real_feature is output folder which contain output feature of input VCF file, and one chromosome corresponds to one output feature file.
+
+step2:
+
+```python
+python3.8 DASD.py pred -m MODEL_PATH -M 5 -f real_feature/CEU.chr2.vcf_featureMap.npy -p real_feature/CEU.chr2.vcfposInfo -o pred_res/CEU.chr2.pred.txt
+```
+
+MODEL_PATH is the path of folder which contain multi models. The value after M corresponds to the number of models the folder contains. real_feature/CEU.chr2.vcf_featureMap.npy and real_feature/CEU.chr2.vcfposInfo is the output of step1, which are the feature and position information of chromosome 2  respectively.
+
+
 
 ## Homo sapiens
 
 ### <1>CEU Model
 
-**Description:** Model for detection and classification selective sweep of CEU population.
+**Description:** Model for detection and classification selective sweep of Utah residents  with Northern and Western European ancestry population.
 
 **Location:** available_models/Homo_sapiens/CEU
 
@@ -323,7 +356,7 @@ We put some models trained for specific species and groups in `available_models`
 
 ### <1> LW Model
 
-**Description:** Model for detection and classification selective sweep of LW population.
+**Description:** Model for detection and classification selective sweep of Large White pig population.
 
 **Location:** available_models/Sus_scrofa/LW
 
@@ -333,7 +366,7 @@ We put some models trained for specific species and groups in `available_models`
 
 ### <1> BFS Model
 
-**Description:** Model for detection and classification selective sweep of BFS population.
+**Description:** Model for detection and classification selective sweep of A. gambiae from Burkina Faso population.
 
 **Location:** available_models/Anopheles_gambiae/BFS
 
