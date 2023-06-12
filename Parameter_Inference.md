@@ -48,11 +48,25 @@ Set `PATH_TO_RELATE` as the path where the Relate software is located. `RelateFi
 
 <1>Generation of `poplabels` Files
 
+Perform the following steps to generate `poplabels` files:
 
+write this code in `get_poplabels.sh`
 
 ```shell
-example.poplabels
+for ((i=1; i<=$1; i++)); do
+    echo "1 group1 group1 0" >> example.poplabels
+done
 ```
+
+ <p align="center"><b>（script name: get_poplabels.sh  ）</b></p>
+
+Execute `get_poplabels.sh` with the following command:
+
+```shell
+bash get_poplabels.sh sampleNum
+```
+
+sampleNum is the sample number in the vcf file
 
 
 
@@ -72,8 +86,6 @@ ancestor refers to the reference sequence of the pig genome (Sus_scrofa.Sscrofa1
 
 
 
-
-
 #### 1.3 Generate Files for Parameter Inference
 
 <1> Generation of Genetic Map 
@@ -88,11 +100,91 @@ N=150
 m=1.25e-8
 mem=1
 $script --mode All -m $m -N $N --haps example.input.haps.gz \
-		--sample example.input.sample.gz --map $map --memory $mem --annot example.input.annot \
+		--sample example.input.sample.gz --map $map --memory $mem \
+		--annot example.input.annot \
 		--seed 1 -o example
 ```
 
 script represents the path to the binary file `Relate` required for this operation. N denotes the effective population size, which should be set based on the effective population size of the species. m represents the mutation rate, which should be set as a prior assumption. 'example.input.sample.gz', 'example.input.sample.gz', and 'example.input.annot' are the output results from 1.2.  'example' is the prefix for the resulting output, which will generate two files: 'example.anc' and 'example.mut'.
+
+**Note: The input file should be located in the current path **
+
+
+
+#### pipline for step1
+
+This pipline is uesd to our previous study which integration 1.1, 1.2, and 1.3 , can directory get .anc and .mut file for mutation and demographic inference. 
+
+**pipline1: input vcf file of single chromosome, get  .anc and .mut files of the chromosome.**
+
+```shell
+#!/usr/bin/bash
+
+N=150
+m=1.25e-8
+mem=1
+ancestor=Sus_scrofa.Sscrofa11.1.dna.toplevel.fa #Ancestral reference sequence
+script1=PATH_TO_RELATE/bin/RelateFileFormats #
+script2=PATH_TO_RELATE/scripts/PrepareInputFiles/PrepareInputFiles.sh #Use the PrepareInputFiles.sh script from Relate to complete the process
+script3=PATH_TO_RELATE/bin/Relate #
+
+name=$1
+sampleNum=$2
+
+$script1 --mode ConvertFromVcf \
+		 --haps $name.haps \
+		 --sample $name.sample \
+         -i $name 
+
+for ((i=1; i<=sampleNum; i++)); do
+    echo "1 group1 group1 0" >> example.poplabels
+done
+
+bash $script2 --haps $name.haps \
+            --sample $name.sample \
+            --poplabels $name.poplabels \
+            --ancestor $ancestor -o $name.input   
+            
+$script --mode All -m $m -N $N --haps $name.input.haps.gz \
+		--sample $name.input.sample.gz --map $map --memory $mem --annot $name.input.annot \
+		--seed 1 -o $name
+```
+
+ <p align="center"><b>（pipline name: getInputFiles.sh ）</b></p>
+
+write this code in `getInputFiles.sh`  and seven parameter should be set, include: effective population size **N**, prior mutation rate **m**, memory required for program operation **mem**, ancestral reference sequence **ancestor**, Absolute path where `RelateFileFormats` is located **script1**, Absolute path where `PrepareInputFiles.sh` is located **script2**, Absolute path where `Relate` is located **script3**. 
+
+Execute `getInputFiles.sh` with the following command:
+
+```shell
+bash getInputFiles.sh LW_chr1.vcf sampleNum
+```
+
+LW_chr1.vcf is the input vcf file of single chromosome; sampleNum is the sample number in the vcf file.
+
+
+
+**pipline2: get .anc and .mut files of the whole genome.**
+
+```shell
+dir=$1
+for name in $(ls $dir)
+do
+ getInputFiles.sh name
+done
+```
+
+ <p align="center"><b>（pipline name: batch_getInputFiles.sh ）</b></p>
+
+write this code in `batch_getInputFiles.sh` 
+
+Execute the pipline with the following command:
+
+```
+bash batch_getInputFiles.sh dirpath
+```
+
+dirpath is the input folder path, which contains the single chromosome vcf files to be entered.
 
 
 
@@ -112,7 +204,7 @@ $script \
 		-o example_mutation
 ```
 
-'PATH_TO_RELATE/bin/RelateMutationRate' represents the path to the binary file `RelateMutationRate` required for this operation. 'example' is the prefix for the files 'example.anc' and 'example.mut'. Use the '-years_per_gen' option to specify the generation time interval information. 'example_mutation' is the output file which contains estimated recombination rate information.
+'PATH_TO_RELATE/bin/RelateMutationRate' represents the path to the binary file `RelateMutationRate` required for this operation. 'example' is the prefix for the files 'example.anc' and 'example.mut'.  '-years_per_gen' is a optional option which specify years per generation, Default: 28 .  'example_mutation' is the output file which contains estimated recombination rate information.
 
 <2> Inference base on Multiple Chromosome
 
@@ -120,17 +212,22 @@ $script \
 input=example
 gen=2
 star=1
-end=9
+end=2
 script=PATH_TO_RELATE/bin/RelateMutationRate
 
 bash $script -i $input \
              --first_chr $star --last_chr $end\
              --years_per_gen $gen \
-             --seed 1 \
              -o example_mutation
 ```
 
-'PATH_TO_RELATE/bin/RelateMutationRate' represents the path to the binary file `RelateMutationRate` required for this operation. 'example' is the prefix for the files 'example.anc' and 'example.mut'. 'star 'is the starting chromosome number used for inference. 'end' is the ending chromosome number used for inference. Use the '-years_per_gen' option to specify the generation time interval information. 'example_mutation' is the output file which contains estimated recombination rate information.
+'PATH_TO_RELATE/bin/RelateMutationRate' represents the path to the binary file `RelateMutationRate` required for this operation. 
+
+'example' is the common prefix of the input file. The input file should follow the following naming rules and contain two types: _prefix \_ chromosome index.anc_ and _prefix \_ chromosome index.mut_. In this command, two chromosomes 1 and 2 are combined for joint inference, then the input files should contain four files, named example\_chr1.anc, example\_chr1.mut, example\_chr2.anc, example\_chr2.mut.
+
+ 'star 'is the starting chromosome number used for inference. 'end' is the ending chromosome number used for inference. 
+
+'-years_per_gen' is a optional option which specify years per generation, Default: 28 . 'example_mutation' is the output file which contains estimated mutation rate information.
 
 
 
@@ -142,43 +239,54 @@ bash $script -i $input \
 
 ```shell
 script=PATH_TO_RELATE/scripts/EstimatePopulationSize/EstimatePopulationSize.sh
+input=example
+mutation=1.25e-8
 gen=2
 thread=5
-bash $script -i example \
-             -m 1.25e-8 \
+poplab=example.poplabels
+output=example_popsize
+bash $script -i $input \
+             -m $mutation \
              -years_per_gen $gen \
              --threads $thread \
-             --poplabels example.poplabels \
+             --poplabels $poplab \
              --seed 1 \
-             -o example_popsize
+             -o $output
 ```
 
-'PATH_TO_RELATE/scripts/EstimatePopulationSize/EstimatePopulationSize.sh' represents the path to the script file `EstimatePopulationSize.sh` required for this operation. 'example' is the prefix for the files 'example.anc' and 'example.mut'. Use the '-years_per_gen' option to specify the generation time interval information. 'example.poplabels' is the file generated in step 1.2 <1>. 'thread' is the number of thread used for this progress. 'example_popsize' is the output file which contains estimated demographic information.
+'PATH_TO_RELATE/scripts/EstimatePopulationSize/EstimatePopulationSize.sh' represents the path to the script file `EstimatePopulationSize.sh` required for this operation. 'example' is the prefix for the files 'example.anc' and 'example.mut'. '-years_per_gen' is a optional option which specify years per generation, Default: 28 . 'example.poplabels' is the file generated in step 1.2 <1>. 'thread' is the number of thread used for this progress. 'example_popsize' is the output file which contains estimated demographic.
 
 
 
 <2> Inference base on Multiple Chromosome
 
 ```shell
-input=LW #Set a common prefix for multiple chromosomes
+script=PATH_TO_RELATE/scripts/EstimatePopulationSize/EstimatePopulationSize.sh
+input=example #Set a common prefix for multiple chromosomes
 poplab=example.poplabels
+mutation=1.25e-8
 gen=2
 thread=5
 star=1
-end=9
-script=/public/hsong/software/parameter_inference/relate_v1.1.8_x86_64_dynamic/scripts/EstimatePopulationSize/EstimatePopulationSize.sh 
-
+end=2
+output=example_popsize
 bash $script -i $input \
              --first_chr $star --last_chr $end\
-             -m 1.25e-8 \
-             --poplabels example.poplabels \
+             -m $mutation \
+             --poplabels $poplab \
              --years_per_gen $gen \
              --threads $thread\
              --seed 1 \
-             -o example_popsize
+             -o $output
 ```
 
-'PATH_TO_RELATE/scripts/EstimatePopulationSize/EstimatePopulationSize.sh' represents the path to the script file `EstimatePopulationSize.sh` required for this operation. 'example' is the prefix for the files 'example.anc' and 'example.mut'. 'star 'is the starting chromosome number used for inference. 'end' is the ending chromosome number used for inference.  Use the '-years_per_gen' option to specify the generation time interval information. 'example.poplabels' is the file generated in step 1.2 <1>. 'thread' is the number of thread used for this progress. 'example_popsize' is the output file which contains estimated demographic information.
+'PATH_TO_RELATE/scripts/EstimatePopulationSize/EstimatePopulationSize.sh' represents the path to the script file `EstimatePopulationSize.sh` required for this operation.
+
+'example' is the common prefix of the input file. The input file should follow the following naming rules and contain two types: _prefix \_ chromosome index.anc_ and _prefix \_ chromosome index.mut_. In this command, two chromosomes 1 and 2 are combined for joint inference, then the input files should contain four files, named example\_chr1.anc, example\_chr1.mut, example\_chr2.anc, example\_chr2.mut.
+
+ 'star 'is the starting chromosome number used for inference. 'end' is the ending chromosome number used for inference.  '-years_per_gen' is a optional option which specify years per generation, Default: 28 . 'example.poplabels' is the file generated in step 1.2 <1>. 'thread' is the number of thread used for this progress. 'example_popsize' is the output file which contains estimated demographic.
+
+
 
 ## Prior Setting for Selection Strength
 
@@ -191,3 +299,4 @@ For populations under strong selection, such as Mosquitoes, Domestic Pigs. It is
 ## Inference or Prior Setting of Recombination Rate
 
 The lower limit of recombination rate is recommended to be the mean of inferred mutation rate, and the upper limit of recombination rate is recommended to be three times of the mean of inferred mutation rate. 
+
