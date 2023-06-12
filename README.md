@@ -293,7 +293,9 @@ python3.8 DASD.py pred -m ../Ensemble_CEU_ensemble/ -M 5 -f real_feature/CEU.chr
 
 
 
-# OUTPUT
+# Output
+
+## Output file description
 
 Taking the output results of CEU.chr2.vcf_featureMap.npy as example :
 
@@ -305,7 +307,11 @@ The first column represents the left endpoint of the predicted region. The secon
 
 Taking the first row as an example, the region from 460kbp to 560kbp is determined to be neutral class (according to the label 4 in label_configure.txt).
 
+## calibrate prediction result
 
+For prediction result, if region is  predicted hard sweep or hard linkage, we think it is hard or hard linkage. But, if region is predicted soft sweep or soft linkage, we recommend do this as follow to control false positive rate of prediction result.
+
+we recommend using the top 5% probability values of soft sweep in whole genome  as thresholds to  calibrate the prediction result. For example, if the threshold of soft probability based on genome-wide  is 0.8, the region is predicted as soft sweep and probability is 0.7, we do not recommend treating this region as a soft sweep for subsequent analysis.
 
 # AVAILABLE MODELS
 
