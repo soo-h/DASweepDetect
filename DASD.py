@@ -4,34 +4,34 @@ import subprocess
 import sys
 import os
 
-DASD_version = '1.0.1'
+DASDC_version = '1.0.1'
 
 description_text = "\n".join([
     "==========================================================================",
-    "DASD: (D)omain (A)daptation (S)weep (D)etection",
+    "DASDC: (D)omain (A)daptation (S)weep (D)etection and (C)lassification",
     "==========================================================================",
-    f"Version: DASD {DASD_version}",
+    f"Version: DASDC {DASD_version}",
     "--------------------------------------------------------------------------",
 ])
 
 
 class PreserveNewlinesHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
     def _fill_text(self, text, width, indent):
-        # 按换行符拆分文本，并在每个段落上应用缩进
+        # Split the text by "\n" and apply indentation to each paragraph
         return "".join(indent + line for line in text.splitlines(keepends=True))
 
-## 程序说明
+# Program specification
 parser = argparse.ArgumentParser(description=description_text,formatter_class=PreserveNewlinesHelpFormatter)
 
-## -v 版本 
+# -v output version information
 parser.add_argument(
-        '-v', '--version', action='version', version=f'DASD v{DASD_version}'
+        '-v', '--version', action='version', version=f'DASDC v{DASDC_version}'
     )
 
 
-# 建立多个parser，分别执行不同任务. 添加 description 用于模式前 title 下的描述
+# Build multiple Parsers to perform multiple steps. 
 subparsers = parser.add_subparsers(help='sub-command help')
-# parser1：模拟数据
+# Parser1：step1.simulation data
 parser_simu = subparsers.add_parser('simu', help='step1:Simulate Data',description=\
 '=============================================================================='
 '\n|Note: this is complete by calling Discoal(doi:10.1093/bioinformatics/btw556)|'
@@ -42,7 +42,7 @@ parser_simu.set_defaults(func='simu')
 
 
 
-# parser2:特征图生成
+# Parser2: simulation data feature engineering
 parser_calc_simu = subparsers.add_parser('calc_domain', help='step2:Calcuate summary statistics to generate featureMap of simulation data')
 
 parser_calc_simu.add_argument('-i ','--input',help='<string>: Path to the ms-style simulation data'\
@@ -53,9 +53,7 @@ parser_calc_simu.add_argument('--core', help='CPU Number,default=8,recommand n *
 parser_calc_simu.add_argument('-o ','--out',help='Path to the folder where featureMap to be stored')
 parser_calc_simu.set_defaults(func='calc_domain')
 
-
-
-# parser3:vcf文件---特征图
+# Parser3: real genome data feature engineering
 parser_calc_target = subparsers.add_parser('calc_target', help='step3:Calcuate summary statistics to generate featureMap of target data(VCF Format)')
 parser_calc_target.add_argument('-i ','--input',help='<string>: Path to the VCF or VCF.gz File'\
     '\n When multiple files are entered, Please joint by ,'\
@@ -64,15 +62,12 @@ parser_calc_target.add_argument('--filter',help='Drop sample if SNP < the set va
 parser_calc_target.add_argument('--core', help='CPU Number,default=8,recommand n * 8,n is the number of input file', required=False, default=6)
 parser_calc_target.add_argument('--start', help='The starting point of the region to be calculated', required=False, default=None)
 parser_calc_target.add_argument('--end', help='The end point of the region to be calculated', required=False, default=None)
-parser_calc_target.add_argument('--window-size', help='The windows size of convert feature map', required=False, default=100000)
+parser_calc_target.add_argument('--window-size', help='The windows size of convert feature map', required=False, default=1000000)
 parser_calc_target.add_argument('--window-step', help='The step of windows', required=False,default=None)
 parser_calc_target.add_argument('-o ','--out',help='Path to the folder where featureMap to be stored')
 parser_calc_target.set_defaults(func='calc_target')
 
-
-
-
-# parser4:模拟数据特征图处理
+# Parser4: data annotation
 parser_data_annotation = subparsers.add_parser('data_annotation', help='step4:Annotation data by user-provided profile')
 parser_data_annotation.add_argument('-i ','--input',help='<string>: Path to the VCF or VCF.gz File'\
     '\n When multiple files are entered, Please joint by ,'\
@@ -81,7 +76,7 @@ parser_data_annotation.add_argument('--config', help='Path to the configure file
 parser_data_annotation.add_argument('-o ','--out',help='Path to the folder where dataset to be stored')
 parser_data_annotation.set_defaults(func='data_annotation')
 
-# parser5：模型训练
+# Parser5：model training
 parser_train = subparsers.add_parser('train',help="step5:Domain Adaptive Model Training")
 parser_train.add_argument('--train-data',help='Path to the Train data')
 parser_train.add_argument('--train-label',help='Path to the Train Label data')
@@ -95,7 +90,7 @@ parser_train.add_argument('-M',help='Model number to train', required=False, def
 parser_train.add_argument('-s','--save',help='1 is save model generated during iteration and 0 is only save best model', required=False, default=0)
 parser_train.add_argument('-o ','--out',help='Path to the model to be stored')
 parser_train.set_defaults(func='train')
-## parser6：预测
+## Prser6：predict
 parser_pred = subparsers.add_parser('pred',help="step6:Sweep Dectection And Classifition")
 parser_pred.add_argument('-m','--model',help='Path to model')
 parser_pred.add_argument('-M',help='Number of integrated models')
@@ -106,8 +101,7 @@ parser_pred.set_defaults(func='pred')
 
 
 
-# 解析参数：可理解为通过接受参数对上述过程实例化(可外部传也可内部)
-# 内部：args = parser.parse_args([para1,para2])
+# Parsing parameters
 args = parser.parse_args()
 
 currend_work_dir = os.getcwd()
