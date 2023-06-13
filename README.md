@@ -6,9 +6,19 @@
 
 **_The following contents will be added later:_**
 
-_<1>models that can be utlized for detecting and classifying selective sweep in specific population;_
+ _<1>models that can be utlized for detecting and classifying selective sweep in Corresponding population will continue to add;_
 
 _<2>detailed explanation of model output results and visualization scripts._
+
+
+
+## Configuration required for operation
+
+Applicable platform: Linux
+
+Resource requirement: Since model training requires a lot of resources, we recommend using 8 cpus, 18GB of memory, and 200GB of hard disk storage to operation DASDC at least.
+
+
 
 ## Contents
 
@@ -16,7 +26,7 @@ _<2>detailed explanation of model output results and visualization scripts._
 - **GETTING STARTED**
 - **USAGE**
 - **OUTPUT**
-- **FAQ** 
+- **FAQ**
 
 
 
@@ -36,7 +46,7 @@ If you use this software, then please cite it as
 
 # **GETTING STARTED**
 
-**Note:**`DASDC` was developed based on Python 3.8. Due to the use of certain features specific to Python 3.8, it currently requires Python 3.8 or higher to run. In the future, optimizations will be made to ensure compatibility with other versions of Python 3.
+**Note:**`DASDC` was developed based on Python 3.8. Due to the use of certain features specific to Python 3.8, it currently requires Python 3.8 to run. In the future, optimizations will be made to ensure compatibility with other versions of Python 3.
 
 1.python3.8 instsall
 
@@ -47,7 +57,7 @@ wget https://www.python.org/ftp/python/3.8.6/Python-3.8.6.tgz
 tar -zxvf Python-3.8.6.tgz
 cd Python-3.8.6
 
-./configure --prefix=$PATH
+./configure --prefix=$PATH #Specifies the path of python installation
 
 make
 make install
@@ -57,9 +67,9 @@ $PATH is installation path of python
 
 
 
-2.Create virtual environment（Not necessary）
+2.Create virtual environment（**Not necessary**）
 
-**Suggestion: Create a virtual environment**
+Suggestion: Create a virtual environment to prevent conflicts between DASDC and other project dependency libraries.
 
 
    ```shell
@@ -75,7 +85,7 @@ source my_project_env/bin/activate  # activate virtual environment
 git clone https://github.com/soo-h/DASweepDetect
 ```
 
-Run the following command to install the third-party libraries that the software depends on
+Run the following command to install the third-party dependency  libraries of DASDC
 
 ```shell
 pip3.8 install -r require.txt
@@ -136,7 +146,7 @@ The configuration file should be named "\<name\>\_"configure.txt and the output 
 python3.8 DASD.py simu -i simu_config/ -o simu_data
 ```
 
-- Take the configuration file as input：
+- Take the configuration file as input and stored output in the simu_data folder：
 
 ```shell
 python3.8 DASD.py simu -i simu_config/chSel_configure.txt -o simu_data
@@ -144,9 +154,9 @@ python3.8 DASD.py simu -i simu_config/chSel_configure.txt -o simu_data
 
 
 
-### <2>Configuration file description of simulation data 
+### <2>Configuration file format description
 
-Configuration files can be found in the DASD/simu_config folder, which contains five types of configuration files: hard sweep; hard linkage sweep; soft sweep; soft linkage sweep and neutral. Each type of configuration file corresponds to one configuration file. Configuration parameters to consider include:
+Configuration files can be found in the example/simu_config folder, which contains five types of configuration files: hard sweep; hard linkage sweep; soft sweep; soft linkage sweep and neutral. Each type of configuration file corresponds to one configuration file. Configuration parameters to consider include:
 
 - rep：Simulation times (Default is 2500, which means 2500 simulations are performed and 2500 sets of selective sweep simulation data are generated)
 - hap：Chromosome numbers contained in the population genome (Default is 100)
@@ -159,9 +169,11 @@ Configuration files can be found in the DASD/simu_config folder, which contains 
 - Pxx：Use this paramater when the selected sites are not contiguous. (Default is  (0-0.475 0.525-1)).
 - en：Demographic parameters need to be provided by the user. The format is **en t 0 N~~t~~/N~~a~~**, where **t** represents the backward tracing time, **N~~t~~** represents the group size at time **t**, and **N~~a~~** represents the group size at the current time. By using multiple en parameters, the representation of group history (N varying with t) can be achieved.
 
-The first column of the configuration file represents the parameters used, and the subsequent columns represent the parameter values. Columns are separated by spaces or tabs. For the en parameter, since there are often multiple values, each en parameter is arranged on a separate line.
+The first column of the configuration file represents the parameters used, and the subsequent columns represent the parameter values. Columns are separated by spaces or tabs. For the **en** parameter, since there are often multiple values, each en parameter is arranged on a separate line.
 
-**How to set parameters see：DASweepDetect/Parameter_Inference.md at main · soo-h/DASweepDetect (github.com)](https://github.com/soo-h/DASweepDetect/blob/main/Parameter_Inference.md)**
+**The mutation rate ,recombination rate, selection strength, demographic must be provided by the user, and the rest of the parameters we recommend using the default values. How to set the four required parameters see：**
+
+**DASweepDetect/Parameter_Inference.md at main · soo-h/DASweepDetect (github.com)](https://github.com/soo-h/DASweepDetect/blob/main/Parameter_Inference.md)**
 
 
 
@@ -171,36 +183,36 @@ Use `calc_domain`  to convert simulated data into feature matrix.
 
 **Parameter description**
 
-- **-i** or **--input**：path to the folder where the simulated data file is located, or one or more simulation data files (with`,`as the separator)
+- **-i** or **--input**：path to the folder which contains the simulated data files, or one or more simulation data files (with`,`as the separator)
 - **-o** or **--out**：the path of output folder or file
 
 **Optional parameter**
 
 - **--filter** : the criterion for rejecting samples rejecting samples with less than n SNPs. Default is 250.
-- **--core** : the number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8. n is the number of input files (or files in a folder). Default value is 16.
+- **--core** : the number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8(n is the number of input files or files in a folder). Default value is 16.
 
 **Demo:** Convert the simulated data under the folder of simu_data into feature matrix and store it in the simu_feature folder.
 
 ```shell
-python3.8 DASD.py calc_domain -i simu_data --filter 250 --core 16 -o simu_feature
+python3.8 DASD.py calc_domain -i simu_data -o simu_feature
 ```
 
 
 
 ## Real data feature engineering
 
-Use the `calc_target` function to convert the real genome data into the feature matrix. which is the same as the passed parameter in step2.
+Use the `calc_target` function to convert the real genome data into the feature matrix. 
 
 **Parameter description：**
 
-- **-i** or **--input**：Path to the folder where the  real data file is located, or one or more simulation data files (with `,` as the separator)
+- **-i** or **--input**：Path to the folder which contains the  real data files  of **VCF** format and composed of a single chromosome , or one or more real data files of  **VCF** format and composed of a single chromosome (with `,` as the separator).
 - **-o** or **--out**：the path of output folder or file
 
 **Optional parameter：**
 
-- **--filter** : The criterion for rejecting samples rejecting samples with less than n SNPs. Default is 250.
-- **--window-size** : The windows size of convert feature map. Default=100000
-- **--window-step** : The step of windows. Default=None
+- **--filter** : The criterion for rejecting samples rejecting samples with less than n SNPs , this value must greater than or equal to 250. Default is 250.
+- **--window-size** : The windows size of convert feature map. Default=1000000
+- **--window-step** : The step of windows. Default is window_size / 20, i.e., 50000.
 
 - **--core** : The number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8. n is the number of input files (or files in a folder). Default value is 16.
 - **--start** ： use this parameter to convert part of the chromosome  to a feature map,need provide the start position. Default position is None.
@@ -209,7 +221,7 @@ Use the `calc_target` function to convert the real genome data into the feature 
 **Demo:**  Convert the simulated data under the "real_data" folder into feature matrix and store them in the "real_feature" folder.
 
 ```shell
-python3.8 DASD.py calc_target -i real_data --filter 250 --core 16 -o real_feature
+python3.8 DASD.py calc_target -i real_data -o real_feature
 ```
 
 
@@ -236,7 +248,7 @@ python3.8 DASD.py data_annotation -i simu_feature --config label_configure.txt -
 
 **Configuration file description：**
 
-The configuration file can be found at DASD/label_configure.txt, which consists of two columns. The first column represents the <name> of the custom configuration file specified by the user in step1, and the second column represents the corresponding label for that class.
+The configuration file can be found at example/label_configure.txt, which consists of two columns. The first column represents the <name> of the custom configuration file specified by the user in step1, and the second column represents the corresponding label for that class.
 
 **Note:** The labels are represented by consecutive integers starting from 0. If there are n classes of data (assuming n > 1), the labels should range from 0 to n-1.
 
@@ -277,7 +289,7 @@ Use `pred` complete. Use this function to output selective sweep detection and c
 
 **Parameter description**
 
-- **-m** or **--model**: Path of model.
+- **-m** or **--model**: Path of folder which contain the  sub-models.
 - **-M** : The number of sub-model,should consistent with the provided number of sub-models. Default is 5.
 - **-f** or **--feature**: Path of the feature matrix for the data to be predicted.（the output of step3 ，ending with "vcf_featureMap.npy"）
 - **-p** or **--position**: Path of the position information for the data to be predicted.（the output of step3 , ending with " vcfposInfo "）
@@ -329,20 +341,20 @@ Make predictions about the feature of one chromosome. If predict genome-wide dat
 
 **Demo:**
 
-step1:
+step1: get real feature matrix.
 
 ```python
-python3.8 DASD.py calc_target -i real_data --filter 250 --core 16 -o real_feature
+python3.8 DASD.py calc_target -i real_data -o real_feature
 ```
-real_data is folder which contain input data of VCF format; real_feature is output folder which contain output feature of input VCF file, and one chromosome corresponds to one output feature file.
+real_data is folder which contain input data of **VCF** format and composed of a single chromosome; real_feature is output folder which contain output feature of input VCF file, and one chromosome corresponds to one output feature file.
 
-step2:
+step2: get predict result.
 
 ```python
 python3.8 DASD.py pred -m MODEL_PATH -M 5 -f real_feature/CEU.chr2.vcf_featureMap.npy -p real_feature/CEU.chr2.vcfposInfo -o pred_res/CEU.chr2.pred.txt
 ```
 
-MODEL_PATH is the path of folder which contain multi models. The value after M corresponds to the number of models the folder contains. real_feature/CEU.chr2.vcf_featureMap.npy and real_feature/CEU.chr2.vcfposInfo is the output of step1, which are the feature and position information of chromosome 2  respectively.
+MODEL_PATH is the path of folder which contain multi models. The value after M corresponds to the number of models the folder contains. real_feature/CEU.chr2.vcf_featureMap.npy and real_feature/CEU.chr2.vcfposInfo is the output of step1, which are the feature and position information of chromosome 2  respectively. For whole-genome prediction, the characteristic matrix of each chromosome needs to be predicted separately.
 
 
 
