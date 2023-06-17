@@ -6,6 +6,8 @@ import copy
 import subprocess
 import multiprocessing
 
+import setproctitle
+setproctitle.setproctitle("DASDC")
 import numpy as np
 from script_simu_fev.Data_To_Feature_pipline import write_haf, write_sfs, write_hapFre, write_allelFre\
     , write_safe, write_ihs, write_nsl, write_dihh

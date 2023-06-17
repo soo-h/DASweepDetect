@@ -6,6 +6,8 @@ import subprocess
 import warnings
 import copy
 
+import setproctitle
+setproctitle.setproctitle("DASDC")
 import numpy as np
 
 from script_real_fev import readtools

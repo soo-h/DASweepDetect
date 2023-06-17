@@ -3,9 +3,12 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from util.check_tools import get_input_file,check_label_config
 import os
+import setproctitle
+setproctitle.setproctitle("DASDC")
 
+soft_limit = 2000
+hard_limit = 1500
 
-## 输入配置文件
 ipt = sys.argv[1]
 config = sys.argv[2]
 outdir = sys.argv[3]
@@ -46,6 +49,11 @@ dataLabel = []
 for featureMap_name in featureMapSet:
     featureMap = np.load(featureMap_name)
     sample_number = featureMap.shape[0]
+    if sample_number < hard_limit:
+        sys.exit(f"Error: The sample number of {featureMap_name} is too small,check simulated data! ")
+    
+    if sample_number < soft_limit:
+        print(f"Warning: The sample number of {featureMap_name} is too small")
     label = label_gene(featureMap_name,lab_dict)
     dataLabel.append(np.repeat(label,sample_number))
     dataSet.append(featureMap)
@@ -56,7 +64,6 @@ dataSet[np.isnan(dataSet)] = 0
 dataLabel = np.concatenate(dataLabel)
 
 
-## 划分训练集、验证集、测试集
 dataSet_train,dataSet_val,label_train,label_val = train_test_split(dataSet,dataLabel,test_size=0.2)
 dataSet_val,dataSet_test,label_val,label_test = train_test_split(dataSet_val,label_val,test_size=0.5)
 

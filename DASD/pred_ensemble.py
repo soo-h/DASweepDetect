@@ -1,9 +1,11 @@
 import sys
 import os
+import setproctitle
 
 import numpy as np
 import tensorflow as tf
 
+setproctitle.setproctitle("DASDC")
 def max_minNorm(data):
     if np.ndim(data) == 3:
         max_value = np.max(data,axis=(0,2)).reshape(1,data.shape[1],1)
@@ -53,7 +55,7 @@ if len(sub_model_path) != M:
 pos_info = read_pos_info(pos_info_name)
 real_data = np.load(feature_map_name)
 real_data = max_minNorm(real_data)
-
+real_data[np.isnan(real_data)] = 0
 # Ensemble
 clss = M
 pred_Ensemble = np.zeros((real_data.shape[0], clss))
