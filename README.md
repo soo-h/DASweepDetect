@@ -327,7 +327,7 @@ we recommend using the top 5% probability values of soft sweep in whole genome  
 
 # AVAILABLE MODELS
 
-We put some models trained for specific species and groups in `available_models` folder,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
+We put some models trained for specific species and groups in http://47.108.194.252/,  ,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
 
 **This process is done in the following two steps:**
 
