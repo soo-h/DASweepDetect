@@ -2,14 +2,10 @@
 
 ## *Domain Adversarial Sweep Detection and Classification*
 
-## **_Note：The software is still being updated._**
 
 **_The following contents will be added later:_**
 
  _<1>models that can be utlized for detecting and classifying selective sweep in Corresponding population will continue to add;_
-
-_<2>detailed explanation of model output results and visualization scripts._
-
 
 
 ## Configuration required for operation
