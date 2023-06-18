@@ -1,6 +1,6 @@
 # Instruction
 
-**Required parameters: mutation rate, recombination rate, selection strength, demographic**
+**Required parameters: mutation rate, recombination rate, selection strength, demographic history**
 
 It is recommended to set these parameters based on previous relevant research findings. You can try to find useful information in `stdpopsim`.
 
@@ -229,7 +229,9 @@ bash $script -i $input \
 
 '-years_per_gen' is a optional option which specify years per generation, Default: 28 . 'example_mutation' is the output file which contains estimated mutation rate information.
 
+**<3>get demographic history base output by step2**
 
+The output consists of n rows and two columns, each row containing two elements: the backtracking time and its corresponding mutation rate. **Set the upper and lower limits of the mutation rate by taking the maximum and minimum values of the second column of output.**
 
 ### Step3. Demographic Inference
 
@@ -286,7 +288,9 @@ bash $script -i $input \
 
  'star 'is the starting chromosome number used for inference. 'end' is the ending chromosome number used for inference.  '-years_per_gen' is a optional option which specify years per generation, Default: 28 . 'example.poplabels' is the file generated in step 1.2 <1>. 'thread' is the number of thread used for this progress. 'example_popsize' is the output file which contains estimated demographic.
 
+**<3>get demographic history base output by step3**
 
+Take the last two lines of the output file, corresponding to the backtracking time and the  coalescent rate of the corresponding time, respectively, and **the effective population size is obtained by 1 / (2 *  coalescent rate)**.
 
 ## Prior Setting for Selection Strength
 

@@ -2,10 +2,10 @@
 
 ## *Domain Adversarial Sweep Detection and Classification*
 
+## _Note：The following contents will be added later:_
 
-**_The following contents will be added later:_**
+ _<1>*we will continue to add trained models as potential options to save the user's time*_.
 
- _<1>models that can be utlized for detecting and classifying selective sweep in Corresponding population will continue to add;_
 
 
 ## Configuration required for operation
@@ -28,9 +28,9 @@ Resource requirement: Since model training requires a lot of resources, we recom
 
 # **OVERVIEW**
 
- `DASDC` is a software based on deep learning (domain adversarial networks) for selective sweep identification and classification. It outperforms traditional statistical methods in terms of performance and introduces an adversarial learning module to extract useful invariant representations between simulated and real data. As a result, `DASDC` demonstrates higher generalization in the detection and classification of selective sweep in real genomic data.
+ `DASDC` is a software that utilizes deep learning (specifically, domain adversarial networks) to identify and classify selective sweeps. By incorporating an adversarial learning module to extract useful invariant representations between simulated training data and real data, it outperforms traditional statistical methods. As a result, `DASDC` demonstrates higher generalization in detecting and classifying selective sweeps in real data.
 
-`DASDC` only supports selection signal analysis for a single population. With input of a **single population `VCF` file** and **`population genetic parameters` and `Demographic` of the population**, the software performs six steps to accomplish the identification and classification of selective sweep.
+`DASDC` only supports the analysis of selective sweeps for a single population. With input of a **single population `VCF` file** and **`population genetic parameters` **and **`Demographic` of the population**, the software performs six steps to accomplish the identification and classification of selective sweep.
 
 ![image](https://github.com/soo-h/DASweepDetect/assets/74720083/a1205262-6a17-4ec3-84fb-5e82bb92ca4c)
  <p align="center"><b>（DASDC work diagram）</b></p>
@@ -38,7 +38,7 @@ Resource requirement: Since model training requires a lot of resources, we recom
 
 If you identify any bugs or issues with the software, then please contact  to report the issue.
 
-If you use this software, then please cite it as
+If you use this software, then please cite it as ……
 
 # **GETTING STARTED**
 
@@ -69,24 +69,28 @@ Suggestion: Create a virtual environment to prevent conflicts between DASDC and 
 
 
    ```shell
-python -m venv my_project_env  # create virtual environment
-source my_project_env/bin/activate  # activate virtual environment
+python3.8 -m venv dasdc_env  # create virtual environment
+source dasdc_env/bin/activate  # activate virtual environment
    ```
 
 
 
 3.Software and dependency package installation
 
+<1> DASDC download
+
 ```shell
 git clone https://github.com/soo-h/DASweepDetect
 ```
 
-Run the following command to install the third-party dependency  libraries of DASDC
+<2>Run the following command to install the third-party dependency  libraries for DASDC
 
 ```shell
 pip3.8 install -r require.txt
 ```
-Set executable permissions for `discoal`:
+**Note:  If the pip installation fails**,user can download DASDC_dependency.tar.gz from https://data.mendeley.com/datasets/vdg2nbpc4j and unzip the third-party package under  $PATH/lib/python3.8/site-packages.(\$PATH is the path of the virtual environment). 
+
+<3>Set executable permissions for `discoal`:
 
 ```shell
 chmod 755 discoal
@@ -96,19 +100,19 @@ chmod 755 discoal
 
 # USAGE
 
-The identification and classification of the selective sweep is completed by performing the following 6 steps in sequence:
+The identification and classification of the selective sweeps are completed by performing the following six steps in sequence:
 
-- step1. Data simulation
-- step2. Simulation data feature engineering
-- step3. Real genome data feature engineering
+- step1. Simulate training dataset 
+- step2. Feature engineering for simulated training dataset
+- step3. Feature engineering for real genomic dataset
 - step4. Data annotation
 - step5. Model training
 - step6. Predict
 
-**Note: example files can be downloaded from https://data.mendeley.com/datasets/vdg2nbpc4j**
+**Note: the demo input/output files are readily accessible at https://data.mendeley.com/datasets/vdg2nbpc4j**
 
-## Data simulation
-Use `simu` function to generate  simulation data based on real genome data.
+## Step1.Simulate dataset for model training
+Use `simu` function to generate  simulated training data based on real genome data.
 
 We put the compiled binary package of `discoal` into the code repository and complete the data simulation by calling `discoal ` software. If you need to recompile, download it from the link below and recompile it:
 
@@ -116,15 +120,13 @@ https://github.com/kr-colab/discoal
 
 Citations
 
-- Kern AD and Schrider DR 2016. https://doi.org/10.1093/bioinformatics/btw556
+- Andrew D. Kern, Daniel R.     Schrider, Discoal: flexible coalescent simulations with selection,     Bioinformatics, Volume 32, Issue 24, december 2016, Pages 3839–3841, https://doi.org/10.1093/bioinformatics/btw556.
 
 
 
 ### <1>Command
 
-Input a configuration file or a folder containing only configuration files. If multiple configuration files are input, apply split files by  `,` . The output is simulated data generated based on the parameters in the configuration file.
-
-The configuration file should be named "\<name\>\_"configure.txt and the output simulation data should be "\<name\>\_simulation". \<name\> is the file name defined by the user.
+Input a configuration file or a folder containing only configuration files. If multiple configuration files are inputted, please split them by using  commas . The output is simulated data generated based on the parameters specified in the configuration file. The configuration file should be named "\<name\>\_"configure.txt and the output simulation data should be "\<name\>\_simulation". \<name\> is the file name defined by the user.
 
 **Parameter description：**
 
@@ -136,7 +138,7 @@ The configuration file should be named "\<name\>\_"configure.txt and the output 
 
 **Demo:**
 
-- Take a folder which containing only configuration files as input: Data is simulated based on configuration files in the simu folder and stored output in the simu_data folder.
+- Take a folder containing only configuration files as input: Data is simulated based on configuration files in the simu folder and stored output in the simu_data folder.
 
 ```shell
 python3.8 DASD.py simu -i simu_config/ -o simu_data
@@ -152,28 +154,28 @@ python3.8 DASD.py simu -i simu_config/chSel_configure.txt -o simu_data
 
 ### <2>Configuration file format description
 
-Configuration files can be found in the example/simu_config folder, which contains five types of configuration files: hard sweep; hard linkage sweep; soft sweep; soft linkage sweep and neutral. Each type of configuration file corresponds to one configuration file. Configuration parameters to consider include:
+The configuration demo files can be found in the example/simu_config folder, which contains five types of configuration files: hard sweep; hard linkage sweep; soft sweep; soft linkage sweep and neutral. Each type of configuration file corresponds to one configuration file. Configuration parameters to consider include:
 
 - rep：Simulation times (Default is 2500, which means 2500 simulations are performed and 2500 sets of selective sweep simulation data are generated)
-- hap：Chromosome numbers contained in the population genome (Default is 100)
+- hap：The size of each simulated sample (Default is 100, which means 50 diploid individuals)
 - len：Length of chromosome fragments (Default is 100kbp, maximum length of discoal software is 220kbp, if you need to simulate longer fragments, you need to recompile discoal software. See 3.1)
 - Pt：The value range of mutation rate, consisting of upper and lower limit values, needs to be provided by the user.
 - Pr：The value range of recombination rate, consisting of upper and lower limit values, needs to be provided by the user.
 - Pu：The value of  the selection end time and sampling time (Default is 0.0005982817348574893 0).
 - Pa：The value range of coefficience of selection , consisting of upper and lower limit values, needs to be provided by the user.
 - Px：The region where the selective site occurs (default is 0.475 0.525, that is, the selected site is within 0.475 to 0.525 of the fragment)
-- Pxx：Use this paramater when the selected sites are not contiguous. (Default is  (0-0.475 0.525-1)).
+- Pxx：Use this parameter to specify the occurrence location of the selection when the selective site occurs region consist of  discontinuous intervals. (Default is (0-0.475 0.525-1), which means selective site occurs in 0-0.475 or 0.525-1).
 - en：Demographic parameters need to be provided by the user. The format is **en t 0 N~~t~~/N~~a~~**, where **t** represents the backward tracing time, **N~~t~~** represents the group size at time **t**, and **N~~a~~** represents the group size at the current time. By using multiple en parameters, the representation of group history (N varying with t) can be achieved.
 
-The first column of the configuration file represents the parameters used, and the subsequent columns represent the parameter values. Columns are separated by spaces or tabs. For the **en** parameter, since there are often multiple values, each en parameter is arranged on a separate line.
+The first column of the configuration file represents the used parameters , and the subsequent columns represent the parameter values. Columns are separated by spaces or tabs. For the **en** parameter, since there are often multiple values, each en parameter is arranged on a separate line.
 
-**The mutation rate ,recombination rate, selection strength, demographic must be provided by the user, and the rest of the parameters we recommend using the default values. How to set the four required parameters see：**
+**For a specific population (breed/species), the mutation rate, recombination rate, selection strength, demographic history must be provided by the user, and the rest of the parameters we recommend using the default values. How to set the four required parameters see：**
 
 **DASweepDetect/Parameter_Inference.md at main · soo-h/DASweepDetect (github.com)](https://github.com/soo-h/DASweepDetect/blob/main/Parameter_Inference.md)**
 
 
 
-## Simulation data feature engineering
+## Step2.Feature engineering for simulated dataset
 
 Use `calc_domain`  to convert simulated data into feature matrix.
 
@@ -187,15 +189,17 @@ Use `calc_domain`  to convert simulated data into feature matrix.
 - **--filter** : the criterion for rejecting samples rejecting samples with less than n SNPs. Default is 250.
 - **--core** : the number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8(n is the number of input files or files in a folder). Default value is 16.
 
+
+
 **Demo:** Convert the simulated data under the folder of simu_data into feature matrix and store it in the simu_feature folder.
 
 ```shell
 python3.8 DASD.py calc_domain -i simu_data -o simu_feature
 ```
 
+simu_data is a folder, which contains only simulated data; simu_feature is a folder, which stores  output feature file that correspondence with the input simulated data.
 
-
-## Real data feature engineering
+## Step3.Feature engineering for real genomic data
 
 Use the `calc_target` function to convert the real genome data into the feature matrix. 
 
@@ -220,11 +224,11 @@ Use the `calc_target` function to convert the real genome data into the feature 
 python3.8 DASD.py calc_target -i real_data -o real_feature
 ```
 
+real_data is a folder, which contains only VCF format data with a single chromosome; simu_feature is a folder, which stores  output feature file that correspondence with the input VCF data.
 
+## Step4.Data labeling for simulated dataset
 
-## Data annotation
-
-use `data_annotation` complete，which constructing a dataset for model training based on the configuration file provided by the user.
+Use the `data_annotation` function to construct a dataset for model training based on the configuration file provided by user.
 
 **Parameter description：**
 
@@ -234,13 +238,13 @@ use `data_annotation` complete，which constructing a dataset for model training
 
 
 
-**Demo：** Using the feature matrix under the "simu_feature" folder, construct a training dataset based on the configuration file provided by the user. The generated dataset will be stored in the "trainSet" folder.
+**Demo：** Using the feature matrix under the "simu_feature" folder construct a training dataset based on the configuration file provided by the user. The generated dataset will be stored in the "trainSet" folder.
 
 ```shell
 python3.8 DASD.py data_annotation -i simu_feature --config label_configure.txt -o trainSet
 ```
 
-
+simu_feature is a folder, which contains only feature matrix of simulated data with .npy format;  trainSet is a folder, which stores dataset  that generated by simulated feature matrix.
 
 **Configuration file description：**
 
@@ -248,9 +252,9 @@ The configuration file can be found at example/label_configure.txt, which consis
 
 **Note:** The labels are represented by consecutive integers starting from 0. If there are n classes of data (assuming n > 1), the labels should range from 0 to n-1.
 
-## Model training
+## Step5.Model training
 
-Use `train` complete.   This function use for model training.
+Use the `train` function to train model for detecting and classifying selective sweeps in a specific population.
 
 **Parameter description：**
 
@@ -267,11 +271,11 @@ Use `train` complete.   This function use for model training.
 
 **-a** or **--all** : 0 or 1, where 0 indicates outputting only the best model and 1 indicates outputting all models generated during iterations. Default value is 0.
 
-**-M**： The number of sub-models. It is recommended to use 5. Default value is 5.
+**-M**： The number of ensemble models. It is recommended to use 5. Default value is 5.
 
 
 
-**Demo:** Input the training, validation, and testing datasets, along with the real data feature matrix, and output the trained model to the "Ensemble_CEU" folder.
+**Demo:** Input the training, validation, testing datasets and labels (all this generate in step4), and the real data feature matrix(generate in step3). Output the  trained model to the "Ensemble_CEU" folder.
 
 ```shell
 python3.8 DASD.py train --train-data trainSet/trainSet.npy --train-label trainSet/trainSet_label.npy --valid-data trainSet/validSet.npy --valid-label trainSet/validSet_label.npy --test-data trainSet/testSet.npy --test-label trainSet/testSet_label.npy -t real_feature/ -o ../Ensemble_CEU
@@ -279,14 +283,14 @@ python3.8 DASD.py train --train-data trainSet/trainSet.npy --train-label trainSe
 
 
 
-## Prediction
+## Step6.Prediction
 
 Use `pred` complete. Use this function to output selective sweep detection and classification results.
 
 **Parameter description**
 
-- **-m** or **--model**: Path of folder which contain the  sub-models.
-- **-M** : The number of sub-model,should consistent with the provided number of sub-models. Default is 5.
+- **-m** or **--model**: Path of folder which contains the  sub-models which used ensemble.
+- **-M** : The number of ensemble models. Default is 5.
 - **-f** or **--feature**: Path of the feature matrix for the data to be predicted.（the output of step3 ，ending with "vcf_featureMap.npy"）
 - **-p** or **--position**: Path of the position information for the data to be predicted.（the output of step3 , ending with " vcfposInfo "）
 - **-o** or **--out** ： Path of pred result.
@@ -299,6 +303,10 @@ Use `pred` complete. Use this function to output selective sweep detection and c
 python3.8 DASD.py pred -m ../Ensemble_CEU_ensemble/ -M 5 -f real_feature/CEU.chr2.vcf_featureMap.npy -p real_feature/CEU.chr2.vcfposInfo -o pred_res/CEU.chr2.pred.txt
 ```
 
+../Ensemble_CEU_ensemble/ is the path of folder which contain multi sub-models; The value after M corresponds to the number of models the folder contains. real_feature/CEU.chr2.vcf_featureMap.npy and real_feature/CEU.chr2.vcfposInfo is the output of step3, which are the feature and position information with single chromosome  respectively. 
+
+For whole-genome prediction, each chromosome needs to be predicted separately. It means, if you have ten chromosome  to predict, you need to execute step6 ten times.
+
 
 
 # Output
@@ -307,52 +315,52 @@ python3.8 DASD.py pred -m ../Ensemble_CEU_ensemble/ -M 5 -f real_feature/CEU.chr
 
 Taking the output results of CEU.chr2.vcf_featureMap.npy as example :
 
-![image](https://github.com/soo-h/DASweepDetect/assets/74720083/8b4670b6-0961-4073-a8b7-c5df89613e8e)
+![image-20230614130329187](C:\Users\54230\AppData\Roaming\Typora\typora-user-images\image-20230614130329187.png)
 
  <p align="center"><b>（output file）</b></p>
 
 The first column represents the left endpoint of the predicted region. The second column represents the right endpoint of the predicted region. The third column represents the classification type. The fourth column represents the predicted probability. The fifth column represents the probability of being predicted for each of the five categories.
 
-Taking the first row as an example, the region from 460kbp to 560kbp is determined to be neutral class (according to the label 4 in label_configure.txt).
+Taking the first row as an example, the region from 485kbp to 535kbp is determined to be neutral class (according to the label 4 in label_configure.txt).
 
-## calibrate prediction result
+## Calibrate prediction result
 
-For prediction result, if region is  predicted hard sweep or hard linkage, we think it is hard or hard linkage. But, if region is predicted soft sweep or soft linkage, we recommend do this as follow to control false positive rate of prediction result.
+Regarding the prediction results, if the DASDC method identifies a genomic region as undergoing a hard sweep (or hard linkage sweeps), we have complete confidence in the reliability of these predictions. Therefore, genes enriched within this region can be considered for subsequent functional verification studies. In compare with hard sweeps (or hard linkage sweeps), a relatively higher false positive rate in the detection of soft sweeps (or soft linkage sweeps). Therefore, we recommend implementing a more stringent quality control criterion by choosing only the top 5% of predicted soft sweeps across the whole genome for further analysis. 
 
-we recommend using the top 5% probability values of soft sweep in whole genome  as thresholds to  calibrate the prediction result. For example, if the threshold of soft probability based on genome-wide  is 0.8, the region is predicted as soft sweep and probability is 0.7, we do not recommend treating this region as a soft sweep for subsequent analysis.
+Regarding the highlighting of selective sweep detection results, we posit that linkage class differentiation serves primarily to subdivide and further reduce false positive rates in both hard and soft sweeps. Furthermore, the significance of linkage classes lies in their ability to support hard and soft sweeps. Therefore, in order to achieve a more intuitive graphical effect when highlighting the prediction results of hard sweeps, we suggest considering adding the prediction probabilities of hard sweep and its linkage. As for soft sweeps, due to their higher false positive rate with soft linkage, we recommend only using predicted soft sweeps for highlighting.
 
 # AVAILABLE MODELS
 
-We put some models trained for specific species and groups in http://47.108.194.252/,  ,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
+We put some models trained for specific species (or populations) in http://47.108.194.252/,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
 
 **This process is done in the following two steps:**
 
-- step1: Real data feature engineering (detail see USAGE: Real data feature engineering)
+- step1: Feature engineering for real genomic data (detail see USAGE: Feature engineering for real genomic data)
 
 The input is folder which constitute of contains only one chromosome VCF format files.  If genome-wide data is used, it needs to be split into multiple files by chromosome.
 
 - step2: Prediction (detail see USAGE: Prediction)
 
-Make predictions about the feature of one chromosome. If predict genome-wide data,it needs to predict chromosome feature separately.
+Make predictions about the feature of one chromosome. To predict genome-wide data,it needs to predict chromosome feature separately.
 
 **Demo:**
 
-step1: get real feature matrix.
+- step1: get real feature matrix.
 
 ```python
 python3.8 DASD.py calc_target -i real_data -o real_feature
 ```
-real_data is folder which contain input data of **VCF** format and composed of a single chromosome; real_feature is output folder which contain output feature of input VCF file, and one chromosome corresponds to one output feature file.
+real_data is folder which contain input data with **VCF** format; real_feature is output folder which contain output feature of input VCF file, and one chromosome corresponds to one output feature file.
 
-step2: get predict result.
+- step2: get predict result.
 
 ```python
 python3.8 DASD.py pred -m MODEL_PATH -M 5 -f real_feature/CEU.chr2.vcf_featureMap.npy -p real_feature/CEU.chr2.vcfposInfo -o pred_res/CEU.chr2.pred.txt
 ```
 
-MODEL_PATH is the path of folder which contain multi models. The value after M corresponds to the number of models the folder contains. real_feature/CEU.chr2.vcf_featureMap.npy and real_feature/CEU.chr2.vcfposInfo is the output of step1, which are the feature and position information of chromosome 2  respectively. For whole-genome prediction, the characteristic matrix of each chromosome needs to be predicted separately.
+MODEL_PATH is the path of folder which contain multi sub-models. The value after M corresponds to the number of models the folder contains. real_feature/CEU.chr2.vcf_featureMap.npy and real_feature/CEU.chr2.vcfposInfo is the output of step1, .which are the feature and position information with single chromosome  respectively. 
 
-
+For whole-genome prediction, each chromosome needs to be predicted separately. It means, if you have ten chromosome  to predict, you need to execute step2 ten times
 
 ## Homo sapiens
 
@@ -360,7 +368,7 @@ MODEL_PATH is the path of folder which contain multi models. The value after M c
 
 **Description:** Model for detection and classification selective sweep of Utah residents  with Northern and Western European ancestry population.
 
-**Location:** available_models/Homo_sapiens/CEU
+**Location:** Homo_sapiens/CEU
 
 **Citations:**
 
@@ -372,7 +380,7 @@ MODEL_PATH is the path of folder which contain multi models. The value after M c
 
 **Description:** Model for detection and classification selective sweep of Large White pig population.
 
-**Location:** available_models/Sus_scrofa/LW
+**Location:** Sus_scrofa/LW
 
 **Citations:**
 
@@ -382,7 +390,7 @@ MODEL_PATH is the path of folder which contain multi models. The value after M c
 
 **Description:** Model for detection and classification selective sweep of A. gambiae from Burkina Faso population.
 
-**Location:** available_models/Anopheles_gambiae/BFS
+**Location:** Anopheles_gambiae/BFS
 
 **Citations:**
 
