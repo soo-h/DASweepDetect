@@ -315,7 +315,7 @@ For whole-genome prediction, each chromosome needs to be predicted separately. I
 
 Taking the output results of CEU.chr2.vcf_featureMap.npy as example :
 
-![image-20230614130329187](C:\Users\54230\AppData\Roaming\Typora\typora-user-images\image-20230614130329187.png)
+![image](https://github.com/soo-h/DASweepDetect/assets/74720083/dfe357d9-7e9f-4474-9686-5078228cb314)
 
  <p align="center"><b>（output file）</b></p>
 
