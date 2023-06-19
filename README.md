@@ -331,7 +331,7 @@ Regarding the highlighting of selective sweep detection results, we posit that l
 
 # AVAILABLE MODELS
 
-We put some models trained for specific species (or populations) in http://47.108.194.252/,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
+We put some models trained for specific species (or populations) in http://47.108.194.252/ (or https://data.mendeley.com/datasets/vdg2nbpc4j),  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
 
 **This process is done in the following two steps:**
 
