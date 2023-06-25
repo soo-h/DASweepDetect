@@ -32,8 +32,10 @@ if outdir == '.':
 if not outdir.endswith('/'):
     outdir = f'{str(outdir)}/'
 
-# 模型训练所需最小样本数---待定
-min_sample = 3000
+if not os.path.exists(outdir):
+    subprocess.call(f"mkdir {outdir}",shell=True)
+    
+min_sample = 1500
 
 
 def iter_file(fileSet):
