@@ -50,10 +50,10 @@ def iter_file(fileSet):
 
 def para_run(process_query, coreNum):
     """
-    进程管理,基于CPU核心数和要执行进程数，对资源进行分配。
-    :param process_query: 生成器；包含要执行的进程对象（multiprocess.Process）
-    :param coreNum: 被分配给任务的核心数
-    :return: 任务全部完成时返回
+    Process management
+    param:
+        process_query: Generator; consistant of multiprocess.Process
+        coreNum: the number of available cpu
     """
     process_running = []
 
@@ -65,9 +65,9 @@ def para_run(process_query, coreNum):
     while True:
         fin = False
         time.sleep(30)
-        # 入队
+
         while sum(p.is_alive() for p in process_running) < coreNum:
-            # 中止结束的进程
+            # clear task
             for _ in process_running:
                 if not _.is_alive():
                     _.terminate()
@@ -83,16 +83,14 @@ def para_run(process_query, coreNum):
         if fin:
             break
 
-    # 等待任务子进程结束
+    # wait task finish
     while sum(p.is_alive() for p in process_running) != 0:
         time.sleep(30)
     return 0
 
 
 def calc_stastic_simu(file, core_num, cutoff, opt):
-    """
-    未判断用户是否有足够的cpu进行并行
-    """
+
     name = file.split('/')[-1]
     opt = opt + name
 
@@ -116,7 +114,7 @@ def calc_ehh_base(name_list, core_num, cutoff, outdir):
     core_number_every_process = core_num // process_number
     residue_core = core_num % process_number
     
-    # 为父进程和子进程分配资源
+    # Allocation cpu
     if core_number_every_process > 0:
         core_list = [core_number_every_process if i != process_number-1 \
                          else core_number_every_process + residue_core \
@@ -133,7 +131,7 @@ def calc_ehh_base(name_list, core_num, cutoff, outdir):
 
     process_query = iter([ihs, nsl, dihh])
 
-    # 管理父进程(统计量)
+
     _ = para_run(process_query, core_numer_p_process)
 
     return 0
@@ -174,7 +172,7 @@ class process_saver():
         self.run_number -= count
 
     def update(self):
-        # 记录释放出的核数
+        # Record avliable core number
         release_core = 0
         new_process = []
         new_core = []
@@ -210,7 +208,7 @@ def process_scheduling():
     if coreNum > max_core_number:
         print(f"Warning: too much cpu!! Recommend {corenumber_need_by_one_file * fileNum}")
 
-    # 先ehh再其它统计量
+ 
     if coreNum > ehh_core_number:
         residul_core = coreNum - ehh_core_number
         ehh = multiprocessing.Process(target=calc_ehh_base, args=(nameSet, ehh_core_number, cutoff, outdir))
@@ -241,7 +239,7 @@ def process_scheduling():
                     core_relase = process_info.update()
                     residul_core += core_relase
 
-    # ehh执行完毕后执行其它统计量
+
     else:
         residul_core = 0
         ehh = multiprocessing.Process(target=calc_ehh_base, args=(nameSet, coreNum, cutoff, outdir))
@@ -251,6 +249,7 @@ def process_scheduling():
 
         file = next(file_iter)
         while file != "finish0":
+
             if residul_core > 5:
                 residul_core -= 5
                 p = multiprocessing.Process(target=calc_stastic_simu, args=(file, 5, cutoff, outdir))
@@ -261,11 +260,13 @@ def process_scheduling():
                 if residul_core > 0:
                     p = multiprocessing.Process(target=calc_stastic_simu, args=(file, residul_core, cutoff, outdir))
                     process_info.append(p,residul_core)
+                    p.start()
                     residul_core = 0
                     process_info.add(1)
                     file = next(file_iter)
                 else:
                     while np.sum([p.is_alive() for p in process_info.process]) == process_info.run_number:
+                        print(f"runing number: {process_info.run_number}, runing process: " + '\t'.join([str(x) for x in process_info.process]) + '\n')
                         time.sleep(30)
                     core_relase = process_info.update()
                     residul_core += core_relase
