@@ -254,6 +254,7 @@ def process_scheduling():
                 residul_core -= 5
                 p = multiprocessing.Process(target=calc_stastic_simu, args=(file, 5, cutoff, outdir))
                 process_info.append(p,5)
+                p.start()
                 process_info.add(1)
                 file = next(file_iter)
             else:
@@ -266,7 +267,6 @@ def process_scheduling():
                     file = next(file_iter)
                 else:
                     while np.sum([p.is_alive() for p in process_info.process]) == process_info.run_number:
-                        print(f"runing number: {process_info.run_number}, runing process: " + '\t'.join([str(x) for x in process_info.process]) + '\n')
                         time.sleep(30)
                     core_relase = process_info.update()
                     residul_core += core_relase
