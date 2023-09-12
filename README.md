@@ -30,7 +30,7 @@ Resource requirement: Since model training requires a lot of resources, we recom
 
  `DASDC` is a software that utilizes deep learning (specifically, domain adversarial networks) to identify and classify selective sweeps. By incorporating an adversarial learning module to extract useful invariant representations between simulated training data and real data, it outperforms traditional statistical methods. As a result, `DASDC` demonstrates higher generalization in detecting and classifying selective sweeps in real data.
 
-`DASDC` only supports the analysis of selective sweeps for a single population. With input of a **single population `VCF` file** and **`population genetic parameters` **and **`Demographic` of the population**, the software performs six steps to accomplish the identification and classification of selective sweep.
+`DASDC` only supports the analysis of selective sweeps for a single population. With input of a **single population `VCF` file** and **`population genetic parameters`** and **`Demographic` of the population**, the software performs six steps to accomplish the identification and classification of selective sweep.
 
 ![image](https://github.com/soo-h/DASweepDetect/assets/74720083/a1205262-6a17-4ec3-84fb-5e82bb92ca4c)
  <p align="center"><b>（DASDC work diagram）</b></p>
@@ -331,7 +331,7 @@ Regarding the highlighting of selective sweep detection results, we posit that l
 
 # AVAILABLE MODELS
 
-We put some models trained for specific species (or populations) in http://47.108.194.252/ (or https://data.mendeley.com/datasets/vdg2nbpc4j),  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
+We put some models trained for specific species (or populations) in  https://data.mendeley.com/datasets/vdg2nbpc4j,  users can directly select the model corresponding to the population to be studied for the detection and classification of the selective sweep .
 
 **This process is done in the following two steps:**
 
