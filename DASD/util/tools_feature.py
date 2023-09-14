@@ -14,17 +14,16 @@ def namesort(nameSet):
     
     return sort_name 
             
-    
 def readstar_step(name):
-    if ('ihs' in name) | ('nsl' in name)  | ('dihh' in name):
+    if name.endswith('_ihsStastic') | name.endswith('_nslStastic') | name.endswith('_dihhStastic'):
         star = 0 
         step = 1
         
-    elif ('HAF' in name) | ('safe' in name) | ('kappa' in name) | ('phi' in name) | ('allel' in name):
+    elif name.endswith('_HAFStastic') | name.endswith('_safe') | name.endswith('_kappa') | name.endswith('_phi') | name.endswith('_allelFrebaseStastic'):
         star =0 
         step = 5
         
-    elif ('hapFre' in name) | ('sfs' in name):
+    elif ('_hapFrebaseStastic' in name) | ('_sfsStastic' in name):
         star = 0
         step = 6
         
@@ -32,8 +31,6 @@ def readstar_step(name):
         sys.exit('Error')
     
     return star,step
-
-
 
 def readstastic(name):
     

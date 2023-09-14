@@ -1,5 +1,23 @@
 import os
 
+def check_region_paramater(position):
+    if position == "None":
+        position = None
+    else:
+        position = int(position)
+
+    return position
+
+def check_step(step,window_size):
+    if step == "None":
+        step = int(window_size / 20)
+    else:
+        step = int(step)
+    return step
+
+
+
+
 def get_input_file(path):
     """
     input : path
@@ -20,7 +38,7 @@ def get_input_file(path):
     return nameSet
 
 def check_label_config(lab_dict):
-    # 检查是否为整数
+    # check labels are int
     for key in lab_dict:
         try:
             lab_dict[key] = int(lab_dict[key])
@@ -28,11 +46,11 @@ def check_label_config(lab_dict):
             print(e)
             print("Error: label must be integers and greater than or equal to 0 !")
 
-    # 检查label 和category 一一对应
+    # check labels and categories 
     if len(lab_dict) != len(set(lab_dict.values())):
         raise ValueError('The category must correspond to the label one by one.\n' + \
                          '\tCheck whether the label is repeated in different categories!')
-    # 检查label是否连续
+    # check labels are continuous
     label = list(lab_dict.values())
     if max(label) - min(label) != len(label) - 1:
         raise ValueError('Label must be consecutive !')
