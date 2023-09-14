@@ -14,103 +14,16 @@ from script_real_fev import readtools
 from script_real_fev import write_real_fev
 from util import window_tools
 from util.tools_feature import loadstastic
+from util.check_tools import check_region_paramater, check_step
+from util.process_control import para_run, process_saver
 
 warnings.filterwarnings("ignore")
-
-
-
-
-nameSet = sys.argv[1]
-coreNum = int(sys.argv[2])
-tolearance = int(sys.argv[3])
-start_position = sys.argv[4]
-end_position = sys.argv[5]
-window_size = int(sys.argv[6])
-window_step = sys.argv[7]
-outdir = sys.argv[8]
-
-
-
-## check input is directory
-if os.path.isdir(nameSet):
-    if not nameSet.endswith('/'):
-        dirpath = nameSet + '/'
-    else:
-        dirpath = nameSet
-
-    nameSet = [dirpath + name for name in os.listdir(dirpath)] 
-    if len(nameSet) != np.sum([True for n in nameSet if n.endswith('.vcf.gz') or n.endswith('.vcf')]):
-        print("Error:The files in the input folder must be .vcf or .vcf.gz files.")
-        sys.exit(1)
-
-else:
-    nameSet = nameSet.split(',')
-
-if not outdir.endswith('/'):
-    outdir = f'{str(outdir)}/'
-
-
-def check_region_paramater(position):
-    if position == "None":
-        position = None
-    else:
-        position = int(position)
-
-    return position
-
-def check_step(step,window_size):
-    if step == "None":
-        step = int(window_size / 20)
-    else:
-        step = int(step)
-    return step
-
-if len(nameSet) > 1:
-    try:
-        start_position == end_position == "None"
-    except Exception as e:
-        print("Error:The start and stop sites are not allowed \
-            when multiple VCF files are passed into the program!!!. ")
 
 
 def real_data_generator(dataSet,posSet):
     assert len(dataSet) == len(posSet)
     for i in range(len(posSet)):
         yield (np.asarray(dataSet[i]),np.asarray(posSet[i]))
-
-def para_run(process_query,coreNum):
-    process_running = []
-    
-    for _ in range(coreNum):
-        p = next(process_query)
-        process_running.append(p)
-        p.start()
-
-    while True:
-        fin = False
-        time.sleep(10)
-        ## 入队
-        while sum(p.is_alive() for p in process_running) < coreNum:
-            ## 中止结束的进程
-            for _ in process_running:
-                if not _.is_alive():
-                    _.terminate()
-            try:
-                p = next(process_query)
-            except Exception:
-                fin = True
-                break
-
-            process_running.append(p)
-            p.start()
-
-        if fin:
-            break
-
-    ## 等待任务子进程结束
-    while sum(p.is_alive() for p in process_running) != 0:
-        time.sleep(10)
-    return 0
 
 def iter_file(fileSet):
     ljl = iter(fileSet)
@@ -127,6 +40,13 @@ def save_position(posSet,opt):
         _ = [f.write(str(_[0])+'\t'+str(_[-1])+'\n') for _ in posSet]
     return 0
 
+def get_opt_name(outdir,file):
+
+    opt = outdir + file.split('/')[-1]
+    
+    if opt.endswith('.gz'):
+        opt = opt[:-3]
+    return opt
 
 def calc_stastic_real(file,coreNum,tolearance,start_position,end_position,window_size,window_step,opt):
 
@@ -165,84 +85,179 @@ def calc_stastic_real(file,coreNum,tolearance,start_position,end_position,window
     _ = para_run(process_query,coreNum)
     return 0
 
-
-def get_featureMap(file,coreNum,tolearance,start_position,end_position,window_size,window_step,outdir):
-    #remain = True
+def get_featureMap(file, outdir):
+    #remain = True    
     name = file.split('/')[-1]
-    if name.endswith('gz'):
+    if name.endswith('.gz'):
         name = name[:-3]
     opt = outdir + name
-    _ = calc_stastic_real(file,coreNum,tolearance,start_position,end_position,window_size,window_step,opt)
     
-    # 整理生成特征图
+    # feature map  generation
     featureNameSet = [outdir + caluc_name for caluc_name in os.listdir(outdir) if caluc_name.startswith(f'{name}_')]
     featureMap = loadstastic(copy.deepcopy(featureNameSet))
     
-    #if not remain
-    # 删除中间文件
+    #if not remain, delete intermediate file
     cmd = 'rm -f ' + ' '.join(featureNameSet)
     subprocess.call(cmd,shell=True)
 
-    # 保存特征图
+    # save feature map
     np.save(f'{opt}_featureMap',featureMap)
     return 0
 
-
-
-
-
-core_one_process = 6
-fileNum = len(nameSet)
-if coreNum > core_one_process * fileNum:
-    print(f'Warning: too much cpu!! Recommend {core_one_process * fileNum}')
-
-if coreNum > core_one_process:
-    process_Mcore_number = coreNum / core_one_process
-    core_residue = coreNum % core_one_process
-
+def process_scheduling():
+    
+    fileNum = len(nameSet)
+    core_one_process = 6
+    process_info = process_saver()
     file_iter = iter_file(nameSet)
-    processSet = []
-    process_residu = None
-    while True:
-        run = 0
 
-        if not processSet:
-            run = 1
-            runing_number = 0
-        else:
-            runing_number = np.sum([p.is_alive() for p in processSet])
-            if runing_number < process_Mcore_number:
-                run = 1
+    if coreNum > core_one_process * fileNum:
+        print(f'Warning: too much cpu!! Recommend {core_one_process * fileNum}')
 
-        pre_run_number = int(process_Mcore_number - runing_number)
-        
-        if run == 1:
-            for _ in range(pre_run_number):
-                file = next(file_iter)
-                if file == "finish0":
-                    run = -1
-                    break
+    file = next(file_iter)    
+    residul_core = coreNum
 
-                p = multiprocessing.Process(target=get_featureMap, args=(file,core_one_process,tolearance,start_position,end_position,window_size,window_step,outdir))
-                p.start()
-                processSet.append(p)
-            # 中止
-            if run == -1:
-                break
+    while file != "finish0":
+        # set opt file name 
+        opt = get_opt_name(outdir,file) 
 
-
-        if (process_residu and not process_residu.is_alive() \
-            or not process_residu):
-
+        # Available cores large than threshold
+        if residul_core > core_one_process:
+            p = multiprocessing.Process(target=calc_stastic_real, args=(file, core_one_process, tolearance, start_position, end_position, window_size, window_step, opt))
+            p.start()
+            process_info.append(p, core_one_process)
+            process_info.add(1)
+            residul_core -= core_one_process # updata residul core number
             file = next(file_iter)
-            #中止
-            if file == "finish0":
-                break
-            
-            process_residu = multiprocessing.Process(target=get_featureMap, args=(file,core_residue,tolearance,start_position,end_position,window_size,window_step,outdir))
-            process_residu.start()
 
-else:
-    # 串行
-    for file in nameSet:
-        get_featureMap(file,coreNum,tolearance,start_position,end_position,window_size,window_step,outdir)
+        else:
+            # Available cores large than 0
+            if residul_core > 0:
+                p = multiprocessing.Process(target=calc_stastic_real, args=(file, residul_core, tolearance, start_position, end_position, window_size, window_step, opt))
+                p.start()
+                process_info.append(p, residul_core)
+                process_info.add(1)
+                residul_core -= residul_core # updata residul core number
+                file = next(file_iter)
+            # Available core equal 0
+            else: 
+                while np.sum([p.is_alive() for p in process_info.process]) == process_info.run_number:
+                    time.sleep(30)
+                core_relase = process_info.update()
+                residul_core += core_relase
+    
+    while not process_info.end():
+        time.sleep(30)
+    return 0
+
+if __name__ == "__main__":
+    nameSet = sys.argv[1]
+    coreNum = int(sys.argv[2])
+    tolearance = int(sys.argv[3])
+    start_position = sys.argv[4]
+    end_position = sys.argv[5]
+    window_size = int(sys.argv[6])
+    window_step = sys.argv[7]
+    outdir = sys.argv[8]
+    
+    # check input is directory
+    if os.path.isdir(nameSet):
+        if not nameSet.endswith('/'):
+            dirpath = nameSet + '/'
+        else:
+            dirpath = nameSet
+
+        nameSet = [dirpath + name for name in os.listdir(dirpath)] 
+        if len(nameSet) != np.sum([True for n in nameSet if n.endswith('.vcf.gz') or n.endswith('.vcf')]):
+            print("Error:The files in the input folder must be .vcf or .vcf.gz files.")
+            sys.exit(1)
+    
+    # input is multi file with ',' split 
+    else:
+        nameSet = nameSet.split(',')
+
+    if not outdir.endswith('/'):
+        outdir = f'{str(outdir)}/'
+
+    if not os.path.exists(outdir):
+        subprocess.call(f"mkdir {outdir}",shell=True)
+
+    if len(nameSet) > 1:
+        try:
+            start_position == end_position == "None"
+        except Exception as e:
+            print("Error:The start and stop sites are not allowed \
+                when multiple VCF files are passed into the program!!!. ")
+    
+    # feature computation 
+    process_scheduling()
+    # feature map generation
+    for name in nameSet:
+        get_featureMap(name,outdir)
+
+
+
+
+
+
+
+
+
+
+"""
+# core_one_process = 6
+# fileNum = len(nameSet)
+# if coreNum > core_one_process * fileNum:
+#     print(f'Warning: too much cpu!! Recommend {core_one_process * fileNum}')
+
+# if coreNum > core_one_process:
+#     process_Mcore_number = coreNum / core_one_process
+#     core_residue = coreNum % core_one_process
+
+#     file_iter = iter_file(nameSet)
+#     processSet = []
+#     process_residu = None
+#     while True:
+#         run = 0
+
+#         if not processSet:
+#             run = 1
+#             runing_number = 0
+#         else:
+#             runing_number = np.sum([p.is_alive() for p in processSet])
+#             if runing_number < process_Mcore_number:
+#                 run = 1
+
+#         pre_run_number = int(process_Mcore_number - runing_number)
+        
+#         if run == 1:
+#             for _ in range(pre_run_number):
+#                 file = next(file_iter)
+#                 if file == "finish0":
+#                     run = -1
+#                     break
+
+#                 p = multiprocessing.Process(target=get_featureMap, args=(file,core_one_process,tolearance,start_position,end_position,window_size,window_step,outdir))
+#                 p.start()
+#                 processSet.append(p)
+#             # 中止
+#             if run == -1:
+#                 break
+
+
+#         if (process_residu and not process_residu.is_alive() \
+#             or not process_residu):
+
+#             file = next(file_iter)
+#             #中止
+#             if file == "finish0":
+#                 break
+            
+#             process_residu = multiprocessing.Process(target=get_featureMap, args=(file,core_residue,tolearance,start_position,end_position,window_size,window_step,outdir))
+#             process_residu.start()
+
+# else:
+#     # 串行
+#     for file in nameSet:
+#         get_featureMap(file,coreNum,tolearance,start_position,end_position,window_size,window_step,outdir)
+"""    
