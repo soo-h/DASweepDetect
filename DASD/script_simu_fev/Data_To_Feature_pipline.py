@@ -3,15 +3,11 @@ import os
 from util import stas_compute
 from util.stas_compute import *
 from util.window_tools import *
-from util.process_tools import para_run
+from util.process_control import para_run
 
 
 def write_stats(data_generator, fi,stats, gridNum, snpNum):
-    """
-    组合统计量函数和自定义滑窗函数,完成除沿用allele框架外的EHH方法外其它方法的生成与整合
-    用于真实数据,和ms的区别在于phy_win的划分方式,即增加了vector_loc和Phy_Win部分
-    """
-    # 仅保存value信息
+
     with open(fi,'w') as f:
         for snpMatrix,position in data_generator:
 
