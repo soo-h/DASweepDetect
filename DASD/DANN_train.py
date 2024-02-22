@@ -77,6 +77,7 @@ def read_target_data(target_data, extraction_number):
 
 
 target_data = read_target_data(target_data, dataSet_train.shape[0])
+target_data[np.isnan(target_data)] = 0
 # 预处理
 target_data = max_minNorm(target_data)
 
