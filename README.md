@@ -211,20 +211,21 @@ Use the `calc_target` function to convert the real genome data into the feature 
 **Optional parameter：**
 
 - **--filter** : The criterion for rejecting samples rejecting samples with less than n SNPs , this value must greater than or equal to 250. Default is 250.
-- **--window-size** : The windows size of convert feature map. Default=1000000
-- **--window-step** : The step of windows. Default is window_size / 20, i.e., 50000.
+- **--window-size** : The windows size of convert feature map. The parameter determines the size of genomic information the model utilizes for each learning and prediction. Default=1000000
+- **--window-step** : The step of windows. The parameter determines the size of the region that the model prediction each time. Default is window_size / 20, i.e., 50000. 
 
 - **--core** : The number of CPU cores used to program. Recommended value is a multiple of 8 and not suggest exceed n x 8. n is the number of input files (or files in a folder). Default value is 16.
 - **--start** ： use this parameter to convert part of the chromosome  to a feature map,need provide the start position. Default position is None.
 - **--end**：use this parameter to convert part of the chromosome  to a feature map,need provide the end position. Default position is None
 
-**Demo:**  Convert the simulated data under the "real_data" folder into feature matrix and store them in the "real_feature" folder.
+**Demo:**  Convert the real genome data under the "real_data" folder into feature matrix and store them in the "real_feature" folder.
 
 ```shell
 python3.8 DASD.py calc_target -i real_data -o real_feature
 ```
 
-real_data is a folder, which contains only VCF format data with a single chromosome; simu_feature is a folder, which stores  output feature file that correspondence with the input VCF data.
+The real_data folder should contain real genomic data for selective sweep analysis in VCF format, split by chromosome. It needs to be created by the user. The simu_feature is a folder, which stores  output feature file that correspondence with the input VCF data.\
+**Note:** In this example, the model will perform selective sweep prediction on regions of 50k, and utilizes an additional 475k of upstream and downstream information for each region.
 
 ## Step4.Data labeling for simulated dataset
 
