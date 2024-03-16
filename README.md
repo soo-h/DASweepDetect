@@ -38,7 +38,8 @@ Resource requirement: Since model training requires a lot of resources, we recom
 
 If you identify any bugs or issues with the software, then please contact  to report the issue.
 
-If you use this software, then please cite it as ……
+If you use this software, then please cite it as:
+Song H, Chu J, Li W, et al. A Novel Approach Utilizing Domain Adversarial Neural Networks for the Detection and Classification of Selective Sweeps. Advanced Science(2024) doi:https://doi.org/10.1002/advs.202304842
 
 # **GETTING STARTED**
 
