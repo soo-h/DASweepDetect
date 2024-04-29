@@ -206,7 +206,7 @@ Use the `calc_target` function to convert the real genome data into the feature 
 
 **Parameter description：**
 
-- **-i** or **--input**：Path to the folder which contains the  real data files  of **VCF** format and composed of a single chromosome , or one or more real data files of  **VCF** format and composed of a single chromosome (with `,` as the separator).
+- **-i** or **--input**：Path to the folder which contains the  real data files  of **VCF** format after **phasing** and composed of a single chromosome , or one or more real data files of  **VCF** format and composed of a single chromosome (with `,` as the separator).
 - **-o** or **--out**：the path of output folder or file
 
 **Optional parameter：**
@@ -399,4 +399,4 @@ For whole-genome prediction, each chromosome needs to be predicted separately. I
 
 
 # FAQ
-
+DASDC Communication QQ Group: 602055867, where you can also ask questions and provide feedback.
