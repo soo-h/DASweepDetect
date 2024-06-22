@@ -4,59 +4,16 @@ import subprocess
 
 import numpy as np
 import tensorflow as tf
-from keras.utils import np_utils
+#from tensorflow.keras.utils import to_categorical
+from keras.utils import np_utilsa
+import matplotlib.pyplot as plt
+
 from util.pretreatment import max_minNorm
 from util.DANN_ import feature_extracter, classifier, Discriminator, DANN
 from util.loss import gradient_reversal, loss_domain, early_stop
-import matplotlib.pyplot as plt
+from util.train_utils import parse_model_name, get_target_data_paths
 
-dataSet_train, y, dataSet_val, y_val, dataSet_test, y_test, target_data, M, save, model_name = sys.argv[1:11]
-save = bool(save)
-M = int(M)
-
-if '/' in model_name:
-    model_name = model_name.split('/')
-    model_name_prefix = model_name[-1]
-    model_dir_path = '/'.join(model_name[:-1]) + '/'
-else:
-    model_name_prefix = model_name
-    model_dir_path = './'
-
-staNum = 40
-BATCH_SIZE = 32
-EPOCHS = 50
-
-dataSet_train = np.load(dataSet_train)
-y = np.load(y)
-
-dataSet_val = np.load(dataSet_val)
-y_val = np.load(y_val)
-
-dataSet_test = np.load(dataSet_test)
-y_test = np.load(y_test)
-
-# one-hot
-y = np_utils.to_categorical(y, 5)
-y_val = np_utils.to_categorical(y_val, 5)
-y_test = np_utils.to_categorical(y_test, 5)
-
-dataSet_train = max_minNorm(dataSet_train)
-dataSet_val = max_minNorm(dataSet_val)
-dataSet_test = max_minNorm(dataSet_test)
-
-# check input is directory
-if os.path.isdir(target_data):
-    if not target_data.endswith('/'):
-        dirpath = target_data + '/'
-    else:
-        dirpath = target_data
-
-    target_data = [dirpath + name for name in os.listdir(dirpath) if name.endswith("npy")]
-else:
-    target_data = target_data.split(',')
-
-
-def read_target_data(target_data, extraction_number):
+def sampled_target_data(target_data, extraction_number):
     factor = 2
     extraction_number_every_file = int(factor * extraction_number // len(target_data))
 
@@ -76,44 +33,21 @@ def read_target_data(target_data, extraction_number):
     return target
 
 
-target_data = read_target_data(target_data, dataSet_train.shape[0])
-target_data[np.isnan(target_data)] = 0
-# 预处理
-target_data = max_minNorm(target_data)
-
-# 准备训练数据
-
-if not (staNum == target_data.shape[1] == dataSet_train.shape[1] == dataSet_val.shape[1] == dataSet_test.shape[1]):
-    raise Exception("Error: shape of input data unequal ,please check all input data!")
-
-BUFFER_SIZE_SOURCE = len(dataSet_train)
-BUFFER_SIZE_TARGET = len(target_data)
-BUFFER_SIZE_VALID = len(dataSet_val)
-
-n_step = np.min([BUFFER_SIZE_TARGET, BUFFER_SIZE_SOURCE]) // BATCH_SIZE
-
-
-source_dataset = tf.data.Dataset.from_tensor_slices((dataSet_train, y)).shuffle(BUFFER_SIZE_SOURCE).batch(BATCH_SIZE)
-target_dataset = tf.data.Dataset.from_tensor_slices((target_data, np.repeat(1., len(target_data)))).shuffle(
-    BUFFER_SIZE_TARGET).batch(BATCH_SIZE).repeat()
-val_dataset = tf.data.Dataset.from_tensor_slices((dataSet_val, y_val)).shuffle(BUFFER_SIZE_VALID).batch(BATCH_SIZE)
-# test_dataset = tf.data.Dataset.from_tensor_slices((dataSet_test,y_test)).shuffle(BUFFER_SIZE_TEST).batch(BATCH_SIZE)
-
-print('data read complete!!!')
-
-
-
-
-
-
-
 def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1,stop=5):
     """
-    :param epoch: 最大迭代次数
-    :param model_name: 输出模型名称
-    :param lamda: 对齐损失超参数
-    :param stop: 早停参数
-    :return: 若早停，返回最优模型名称；否则，返回 0
+    Train a DANN model with early stopping.
+    
+    Args:
+        epoch (int): Maximum number of epochs to train.
+        model_name (str): Name for saving the model.
+        source_dataset (tf.data.Dataset): Source domain dataset.
+        target_dataset (tf.data.Dataset): Target domain dataset.
+        val_dataset (tf.data.Dataset): Validation dataset.
+        lamda (float): Alignment loss hyperparameter.
+        stop (int): Early stopping parameter.
+        
+    Returns:
+        tuple: Name of the best model if early stopping occurs, otherwise 0 and the log filename.
     """
     model = DANN(classify=5)
     log = f'{model_name}.log'
@@ -127,10 +61,6 @@ def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1
 
     @tf.function
     def train_step(x_s, x_t, model, alpha, lamda, train_accuracy):
-        # 获取有监督训练的数据及无标签数据
-
-        # model = model
-
         source_X, class_label = x_s
         class_label = tf.cast(class_label, dtype='float32')
         source_domain_label = tf.zeros(len(class_label))
@@ -141,10 +71,8 @@ def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1
         target_domain_label = tf.cast(_, dtype='float32')
 
         with tf.GradientTape() as tape:
-            # 通过两个模型
             class_output, domain_output1 = model(source_X, alpha=alpha)
             _, domain_output2 = model(target_X, alpha=alpha)
-            # 计算三个损失
             err_s_label = tf.reduce_mean(loss_class(class_label, class_output))
             err_s_domain = tf.reduce_mean(loss_domain(source_domain_label, domain_output1))
             err_t_domain = tf.reduce_mean(loss_domain(target_domain_label, domain_output2))
@@ -173,7 +101,7 @@ def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1
         test_accuracy.update_state(labels, class_output)
 
 
-    # 早停设置
+    # early stop
     stop_monitor = early_stop(stop)
     train_accuracy = tf.keras.metrics.CategoricalAccuracy(name='train_accuracy')
     train_loss_container = tf.keras.metrics.Mean(name='train_loss')
@@ -212,7 +140,6 @@ def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1
             num_batches += 1
             i += 1
 
-            # 仅对Epoch0输出其step信息
             if First:
                 if epoch == 0:
                     batch_log = 'epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
@@ -224,7 +151,6 @@ def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1
 
         train_loss_total = total_Loss / num_batches
 
-        # 验证集表现
         for x in val_dataset:
             test_step(x, model, alpha, test_loss_container, test_accuracy)
 
@@ -304,7 +230,7 @@ def plot_train_log(ensemble_log, opt=None):
         plt.savefig(f'{opt}.pdf', format="PDF")
     return 0
 
-def emsemble_train(epoch, model_dir_path, model_name_prefix, source_dataset, target_dataset, val_dataset , M=M, save=save):
+def ensemble_train(epoch, model_dir_path, model_name_prefix, source_dataset, target_dataset, val_dataset , M=M, save=save):
     epoch = epoch
     best_model_list = []
 
@@ -337,7 +263,51 @@ def emsemble_train(epoch, model_dir_path, model_name_prefix, source_dataset, tar
     return ensemble_dir
 
 
+if __name__ == "__main__":
+    train_path, train_labels_path, val_path, val_labels_path, test_path, test_labels_path, target_data_path, M, save, model_name = sys.argv[1:11]
+    save = bool(save)
+    M = int(M)
 
-ensemble_dir = emsemble_train(EPOCHS, model_dir_path, model_name_prefix, source_dataset, target_dataset, val_dataset , M=M, save=save)
-ensemble_log = [f'{ensemble_dir}/{name}' for name in os.listdir(ensemble_dir) if name.endswith('log')]
-plot_train_log(ensemble_log, opt=f"{model_dir_path}ensemble_training_plot")
+    model_dir_path, model_name_prefix = parse_model_name(model_name)
+
+    staNum = 40
+    BATCH_SIZE = 32
+    EPOCHS = 50
+    num_classes = 5
+
+    # data preprocess
+    dataSet_train = max_minNorm(np.load(train_path))
+    dataSet_val = max_minNorm(np.load(val_path))
+    dataSet_test = max_minNorm(np.load(test_path))
+    # label one-hot encoding
+    y = np_utils.to_categorical(np.load(train_labels_path), num_classes)
+    y_val = np_utils.to_categorical(np.load(val_labels_path), num_classes)
+    y_test = np_utils.to_categorical(np.load(test_labels_path), num_classes)
+
+    # get target domain data
+    target_data = get_target_data_paths(target_data_path)
+
+    target_data = sampled_target_data(target_data, dataSet_train.shape[0])
+    target_data[np.isnan(target_data)] = 0
+    # preprocess
+    target_data = max_minNorm(target_data)
+    # check training data
+    if not (staNum == target_data.shape[1] == dataSet_train.shape[1] == dataSet_val.shape[1] == dataSet_test.shape[1]):
+        raise Exception("Error: shape of input data unequal ,please check all input data!")
+
+    BUFFER_SIZE_SOURCE = len(dataSet_train)
+    BUFFER_SIZE_TARGET = len(target_data)
+    BUFFER_SIZE_VALID = len(dataSet_val)
+
+    n_step = np.min([BUFFER_SIZE_TARGET, BUFFER_SIZE_SOURCE]) // BATCH_SIZE
+
+    source_dataset = tf.data.Dataset.from_tensor_slices((dataSet_train, y)).shuffle(BUFFER_SIZE_SOURCE).batch(BATCH_SIZE)
+    target_dataset = tf.data.Dataset.from_tensor_slices((target_data, np.repeat(1., len(target_data)))).shuffle(
+        BUFFER_SIZE_TARGET).batch(BATCH_SIZE).repeat()
+    val_dataset = tf.data.Dataset.from_tensor_slices((dataSet_val, y_val)).shuffle(BUFFER_SIZE_VALID).batch(BATCH_SIZE)
+
+    print('data read complete!!!')
+
+    ensemble_dir = ensemble_train(EPOCHS, model_dir_path, model_name_prefix, source_dataset, target_dataset, val_dataset , M=M, save=save)
+    ensemble_log = [f'{ensemble_dir}/{name}' for name in os.listdir(ensemble_dir) if name.endswith('log')]
+    plot_train_log(ensemble_log, opt=f"{model_dir_path}ensemble_training_plot")

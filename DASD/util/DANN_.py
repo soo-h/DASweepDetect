@@ -70,7 +70,6 @@ class classifier(tf.keras.layers.Layer):
         #self.out = tf.nn.log_softmax(axis=1)
     
     def call(self,inputs):
-            
         x = self.dense1(inputs)
         x = self.bn1(x)
         x = self.relu1(x)
