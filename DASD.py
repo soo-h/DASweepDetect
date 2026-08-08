@@ -59,7 +59,7 @@ parser_calc_target.add_argument('-i ','--input',help='<string>: Path to the VCF 
     '\n When multiple files are entered, Please joint by ,'\
     '\n Example: file1,file2,file3')
 parser_calc_target.add_argument('--filter',help='Drop sample if SNP < the set value,default = 250', required=False, default=250)
-parser_calc_target.add_argument('--core', help='CPU Number,default=8,recommand n * 8,n is the number of input file', required=False, default=6)
+parser_calc_target.add_argument('--core', help='CPU Number,default=8,recommand n * 8,n is the number of input file', required=False, default=8)
 parser_calc_target.add_argument('--start', help='The starting point of the region to be calculated', required=False, default=None)
 parser_calc_target.add_argument('--end', help='The end point of the region to be calculated', required=False, default=None)
 parser_calc_target.add_argument('--window-size', help='The windows size of convert feature map', required=False, default=1000000)
