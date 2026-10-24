@@ -86,12 +86,13 @@ compatible with TensorFlow prediction.
 
 ## Documentation
 
-Full documentation is available at **[docs/index.rst](docs/index.rst)** (RST / Sphinx). Build with:
+The user manual is configured for automatic builds and hosting on
+**[Read the Docs](https://readthedocs.org/)**. Readers do not need to build it
+locally. The project's public documentation URL will be added here after the
+repository is connected and its first build succeeds.
 
-```shell
-python -m pip install sphinx sphinx_rtd_theme
-sphinx-build -b html docs docs/_build
-```
+For maintainers, see the [publishing guide](docs/PUBLISHING.md) for initial
+Read the Docs setup, automatic updates, and optional local previews.
 
 See **[Parameter_Inference.md](Parameter_Inference.md)** for guidance on estimating mutation rates, demographic history, recombination rates, and selection strength using Relate.
 

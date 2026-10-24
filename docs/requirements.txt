@@ -1,0 +1,3 @@
+# Documentation-only dependencies; no training backend is required.
+Sphinx==7.3.7
+sphinx-rtd-theme==3.1.0
