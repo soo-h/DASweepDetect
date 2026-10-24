@@ -1,121 +1,79 @@
-# DASDC
+# DASDC: Detection and classification of selective sweeps
 
-*Domain Adversarial Sweep Detection and Classification*
+1. [Introduction](#1-introduction)
+2. [Installation and usage](#2-installation-and-usage)
+3. [Trained models and example data](#3-trained-models-and-example-data)
+4. [Citation](#4-citation)
+5. [Contact](#5-contact)
+6. [License](#6-license)
 
-DASDC is a deep learning tool that uses domain adversarial neural networks (DANN) to detect and classify selective sweeps in population genomic data. By incorporating adversarial adaptation between simulated training data and real data, it improves generalization under domain mismatch, as described in the [DASDC paper](https://doi.org/10.1002/advs.202304842).
+## 1. Introduction
 
-## Requirements
+**DASDC**, short for **D**omain **A**dversarial **S**weep **D**etection and **C**lassification, is a population-genomics tool for **detecting and classifying selective sweeps within a single population**. It identifies candidate genomic regions and infers whether they have undergone hard or soft selective sweeps, together with the corresponding probabilities.
 
-- **Platform:** Linux (x86-64)
-- **Python:** 3.8 or newer
-- **TensorFlow backend:** Python 3.8-3.9 with TensorFlow 2.7
-- **PyTorch backend:** PyTorch 2.2 or newer; a CUDA-enabled build is required for GPU training
-- **Hardware:** 8+ CPUs, 18 GB+ memory, 200 GB+ disk; a CUDA GPU is recommended for PyTorch training
+DASDC learns population genomic signatures of selection from simulated data, given the scarcity of selection signals in real genomic data. Specifically, DASDC uses a **domain-adversarial learning framework** to align feature representations between simulated and real genomic data while preserving information relevant to selective sweep classification, improving generalization to real data. The trained model is then applied to phased genomic data in VCF format from the corresponding population to detect and classify selective sweeps.
 
-## Quick Start
+<img src="docs/_static/overview-original.png" alt="DASDC workflow and model architecture" width="760" />
 
-The repository includes simulation and label configurations, but not `real_data/`. Before running the pipeline, supply phased, single-population VCF or VCF.GZ files split by chromosome. Larger demonstration files and intermediate results are available from [Mendeley Data](https://data.mendeley.com/datasets/vdg2nbpc4j).
+*DASDC workflow and model architecture.*
 
-```shell
-# TensorFlow workflow: use Python 3.8 or 3.9.
-# Keep this clone in place because the editable installation calls its scripts.
-chmod 755 discoal
-python -m pip install -e .
+<img src="docs/_static/paper/sweep-predictions.png" alt="Hard and soft selective sweep predictions in the LW pig population: NR6A1 and FSHβ" width="700" />
 
-# Run the 6-step pipeline
-dasdc simu -i example/simu_config/ -o simu_data
-dasdc calc_domain -i simu_data -o simu_feature
-dasdc calc_target -i real_data -o real_feature
-dasdc data_annotation -i simu_feature --config example/label_configure.txt -o trainSet
-dasdc train \
-    --train-data trainSet/trainSet.npy --train-label trainSet/trainSet_label.npy \
-    --valid-data trainSet/validSet.npy --valid-label trainSet/validSet_label.npy \
-    --test-data trainSet/testSet.npy --test-label trainSet/testSet_label.npy \
-    -t real_feature/ -o Ensemble_output
-dasdc pred -m Ensemble_output_ensemble/ -M 5 -f real_feature/chr1.vcf_featureMap.npy -p real_feature/chr1.vcfposInfo -o pred_result.txt
-```
+*Hard and soft selective sweep predictions in the LW pig population.*
+[Figure sources and adaptations](https://dasweepdetect.readthedocs.io/en/latest/figure_sources.html).
 
-Each command can also be invoked as `python -m dasdc <command>`. The legacy
-`python3.8 DASD.py <command>` entry point remains available for compatibility.
-Because this installation is editable, do not move or delete the cloned repository
-without reinstalling DASDC.
+## 2. Installation and usage
 
-TensorFlow prediction currently requires `-M 5` and an ensemble directory containing exactly five sub-model directories.
+For installation instructions and usage examples, visit the
+[DASDC documentation](https://dasweepdetect.readthedocs.io/en/latest/).
 
-`--window-size` controls the genomic context used for each prediction;
-`--window-step` controls the distance between successive windows. With the
-default 1 Mb window and 50 kb step, each prediction describes the central
-50 kb interval using 475 kb of context on each side. The reported interval
-is the central 5% of the window, so changing the step alone does not change
-its width.
+The manual covers the [complete selective sweep detection workflow](https://dasweepdetect.readthedocs.io/en/latest/index.html#workflow-modules),
+[parameter inference](https://dasweepdetect.readthedocs.io/en/latest/parameter_inference.html),
+and [prediction outputs](https://dasweepdetect.readthedocs.io/en/latest/outputs.html).
 
-## PyTorch GPU Backend
+DASDC runs on Linux x86-64. TensorFlow is the default backend and PyTorch is
+optional; both support CPU and GPU execution. See the
+[installation guide](https://dasweepdetect.readthedocs.io/en/latest/installation.html)
+for compatible Python versions and GPU requirements.
 
-Install a CUDA-enabled PyTorch build that matches the system driver. For example,
-the following installs PyTorch 2.2.2 for CUDA 12.1; use the
-[official PyTorch selector](https://pytorch.org/get-started/locally/) for other
-CUDA or Python versions.
+## 3. Trained models and example data
 
-```shell
-python -m pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cu121
-python -m pip install -e .
-```
+Population-specific models are available for human CEU, Large White pigs
+(LW), and Burkina Faso *Anopheles gambiae* (BFS). Model and example data
+resources are hosted on [Mendeley Data](https://data.mendeley.com/datasets/vdg2nbpc4j/4).
 
-Train and predict with the same backend:
+To predict with an existing model, follow the
+[trained models guide](https://dasweepdetect.readthedocs.io/en/latest/models.html).
+Use the model for its intended population, with matching feature construction
+and backend. For a new target population, follow the complete workflow to
+train a population-specific model.
 
-```shell
-dasdc train \
-    --train-data trainSet/trainSet.npy --train-label trainSet/trainSet_label.npy \
-    --valid-data trainSet/validSet.npy --valid-label trainSet/validSet_label.npy \
-    --test-data trainSet/testSet.npy --test-label trainSet/testSet_label.npy \
-    -t real_feature/ -M 5 -o Ensemble_output \
-    --backend pytorch --device cuda
+## 4. Citation
 
-dasdc pred \
-    -m Ensemble_output_ensemble/ -M 5 \
-    -f real_feature/chr1.vcf_featureMap.npy \
-    -p real_feature/chr1.vcfposInfo -o pred_result.txt \
-    --backend pytorch --device cuda
-```
+If you use DASDC, please cite:
 
-PyTorch training defaults to 50 epochs, batch size 32, SGD learning rate 0.01,
-five-epoch early stopping, and CUDA automatic mixed precision. Select a visible
-GPU with `--device cuda:1`; use `--device cpu --no-amp` only for debugging.
-Checkpoints are stored as `MODEL_PREFIX_ensemble/model_N/model.pt` and are not
-compatible with TensorFlow prediction.
+Song H, Chu J, Li W, et al. A Novel Approach Utilizing Domain Adversarial
+Neural Networks for the Detection and Classification of Selective Sweeps.
+*Advanced Science* 11(14):2304842 (2024).
+[doi:10.1002/advs.202304842](https://doi.org/10.1002/advs.202304842)
 
-## Documentation
+The simulation workflow uses discoal:
 
-The user manual is configured for automatic builds and hosting on
-**[Read the Docs](https://readthedocs.org/)**. Readers do not need to build it
-locally. The project's public documentation URL will be added here after the
-repository is connected and its first build succeeds.
+Kern & Schrider. discoal: flexible coalescent simulations with selection.
+*Bioinformatics* (2016).
+[doi:10.1093/bioinformatics/btw556](https://doi.org/10.1093/bioinformatics/btw556)
 
-For maintainers, see the [publishing guide](docs/PUBLISHING.md) for initial
-Read the Docs setup, automatic updates, and optional local previews.
+For stdpopsim and Relate citations, see the
+[parameter inference references](https://dasweepdetect.readthedocs.io/en/latest/parameter_inference.html#parameter-references).
 
-See **[Parameter_Inference.md](Parameter_Inference.md)** for guidance on estimating mutation rates, demographic history, recombination rates, and selection strength using Relate.
+## 5. Contact
 
-## Available Models
+Report problems or requests through
+[GitHub Issues](https://github.com/soo-h/DASweepDetect/issues).
+The DASDC Communication QQ Group is **602055867**.
 
-Pre-trained models for specific populations are available at [Mendeley Data](https://data.mendeley.com/datasets/vdg2nbpc4j).
+## 6. License
 
-| Species | Population | Location |
-|---|---|---|
-| *Homo sapiens* | CEU (European) | `available_models/Homo_sapiens/CEU` |
-| *Sus scrofa domestica* | Large White pig | `available_models/Sus_scrofa/LW` |
-| *Anopheles gambiae* | Burkina Faso | `available_models/Anopheles_gambiae/BFS` |
-
-## Support
-
-Report problems through the [GitHub issue tracker](https://github.com/soo-h/DASweepDetect/issues).
-The upstream project also lists DASDC Communication QQ Group: **602055867**.
-
-## References
-
-- Song H, Chu J, Li W, et al. (2024). A Novel Approach Utilizing Domain Adversarial Neural Networks for the Detection and Classification of Selective Sweeps. *Advanced Science*. [doi:10.1002/advs.202304842](https://doi.org/10.1002/advs.202304842)
-- Kern & Schrider (2016) — discoal: [doi:10.1093/bioinformatics/btw556](https://doi.org/10.1093/bioinformatics/btw556)
-
-## License
-
-See [LICENSE](LICENSE) for details.
+DASDC is released under the [MIT License](LICENSE).
+Paper-derived figures retain the attribution and licensing documented in
+[Figure sources and adaptations](https://dasweepdetect.readthedocs.io/en/latest/figure_sources.html).

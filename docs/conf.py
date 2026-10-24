@@ -26,6 +26,11 @@ extensions = [
 # The master toctree document.
 master_doc = 'index'
 
+# Number figures and resolve :numref: links in the manual.
+numfig = True
+numfig_secnum_depth = 0
+numfig_format = {'figure': 'Fig. %s', 'table': 'Table %s', 'code-block': 'Listing %s'}
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -44,6 +49,14 @@ html_theme = 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets).
 html_static_path = ['_static']
+html_css_files = ['custom.css']
+html_title = 'DASDC documentation'
+html_short_title = 'DASDC'
+html_theme_options = {
+    'collapse_navigation': False,
+    'navigation_depth': 2,
+    'titles_only': False,
+}
 
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False

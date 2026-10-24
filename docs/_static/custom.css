@@ -1,0 +1,168 @@
+/* Small, dependency-free refinements to the Read the Docs theme. */
+:root {
+  --dasdc-ink: #203842;
+  --dasdc-muted: #536971;
+  --dasdc-accent: #087b80;
+  --dasdc-line: #dce6ea;
+  --dasdc-callout-bg: #edf7f5;
+  --dasdc-callout-accent: #087b80;
+}
+
+body,
+.rst-content,
+.wy-menu-vertical,
+input {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+body { color: var(--dasdc-ink); }
+a { color: var(--dasdc-accent); }
+a:hover { color: #04575b; }
+.rst-content a:visited { color: #306d75; }
+a:focus-visible {
+  outline: 3px solid #07878d;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.wy-nav-side { width: 280px; background: #152f3b; }
+.wy-side-scroll { width: 300px; }
+.wy-side-nav-search { width: 280px; background: #123b47; padding: 25px 18px; }
+.wy-side-nav-search > a { font-size: 1.3rem; letter-spacing: .035em; }
+.wy-side-nav-search input[type="text"] { border: 1px solid #52737b; border-radius: 6px; }
+.wy-menu-vertical { width: 280px; }
+.wy-menu-vertical p.caption { color: #95d5cd; font-size: .78rem; letter-spacing: .09em; margin-top: 13px; }
+.wy-menu-vertical a { color: #dbe8ec; line-height: 1.55; padding-top: 9px; padding-bottom: 9px; }
+.wy-menu-vertical a:hover { background: #244450; color: #fff; }
+.wy-menu-vertical li.current { background: #f1f7f8; }
+.wy-menu-vertical li.current > a { border-right: 3px solid var(--dasdc-accent); color: #153e48; }
+.wy-menu-vertical li.current a:hover { color: #153e48; background: #e0edef; }
+.wy-menu-vertical li.on a, .wy-menu-vertical li.current > a { border-top-color: transparent; border-bottom-color: transparent; }
+.wy-nav-top { background: #123b47; }
+
+.wy-nav-content-wrap { margin-left: 280px; background: #f3f6f8; }
+.wy-nav-content {
+  max-width: 1180px;
+  min-height: 100vh;
+  padding: 38px 48px 48px;
+  background: #fff;
+  box-shadow: 0 0 0 1px #e6ecef;
+}
+.wy-breadcrumbs { font-size: .9rem; color: var(--dasdc-muted); }
+.rst-content { line-height: 1.72; }
+.rst-content h1, .rst-content h2, .rst-content h3 {
+  font-family: inherit;
+  color: #173944;
+  font-weight: 650;
+}
+.rst-content h1 { font-size: 2.1rem; line-height: 1.25; letter-spacing: -.035em; margin-bottom: 20px; }
+.rst-content h2 { font-size: 1.42rem; line-height: 1.4; margin-top: 34px; padding-bottom: 9px; border-bottom: 1px solid var(--dasdc-line); }
+.rst-content h3 { font-size: 1.12rem; margin-top: 25px; }
+.rst-content p { line-height: 1.72; }
+.project-subtitle { color: var(--dasdc-muted); font-size: 1.1rem; margin-top: -10px; }
+
+/* RTD defaults to nowrap in table cells; allow prose and file names to wrap. */
+.wy-table-responsive {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 16px 0 28px;
+  border: 1px solid var(--dasdc-line);
+  border-radius: 7px;
+}
+.rst-content .wy-table-responsive table.docutils {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+}
+.rst-content .wy-table-responsive table.docutils th,
+.rst-content .wy-table-responsive table.docutils td {
+  white-space: normal;
+  vertical-align: top;
+  padding: 12px 15px;
+  border: 0;
+  border-bottom: 1px solid #e2eaee;
+  line-height: 1.6;
+  font-size: .92rem;
+  overflow-wrap: anywhere;
+}
+.rst-content .wy-table-responsive table.docutils th {
+  background: #eaf2f5;
+  color: #234a57;
+  font-weight: 650;
+  text-align: left;
+}
+.rst-content .wy-table-responsive table.docutils td { background: #fff; }
+.rst-content .wy-table-responsive table.docutils tr:nth-child(even) td { background: #f7fafb; }
+.rst-content .wy-table-responsive table.docutils tbody tr:last-child td { border-bottom: 0; }
+.rst-content .wy-table-responsive table.docutils td p { margin: 0; line-height: 1.6; }
+.module-table td:first-child a { font-weight: 650; text-decoration: none; }
+.module-table td:first-child a:hover { text-decoration: underline; }
+.rst-content code.literal {
+  color: #105b69;
+  background: #edf4f6;
+  border: 0;
+  border-radius: 3px;
+  padding: .12em .28em;
+  font-size: .86em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.rst-content .highlight { background: #f5f8fa; border-radius: 6px; }
+.rst-content div[class^="highlight"] { border: 1px solid #dce6eb; border-radius: 6px; margin: 18px 0 24px; }
+.rst-content div[class^="highlight"] pre { font-size: .84rem; line-height: 1.65; padding: 18px 20px; }
+.rst-content pre, .rst-content code { font-family: "Cascadia Code", Consolas, "Liberation Mono", monospace; }
+/* Note and Important share the guide's callout palette. */
+.rst-content .admonition {
+  color: var(--dasdc-ink);
+  background: var(--dasdc-callout-bg);
+  border-left: 4px solid var(--dasdc-callout-accent);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: none;
+  margin: 23px 0;
+}
+.rst-content .admonition > .admonition-title {
+  font-family: inherit;
+  background: var(--dasdc-callout-accent);
+  color: #fff;
+}
+.rst-content figure { margin: 22px 0 28px; }
+.rst-content figure > span[id] { display: block; scroll-margin-top: 24px; }
+img.workflow-figure, img.overview-figure, img.paper-figure {
+  display: block;
+  width: 80%;
+  max-width: 840px;
+  height: auto;
+  margin: 0 auto;
+}
+.rst-content .figure .caption { color: var(--dasdc-muted); font-size: .88rem; line-height: 1.6; margin-top: 12px; }
+.rst-content strong { font-weight: 700; }
+.rst-content figure figcaption, .rst-content figure .legend { color: var(--dasdc-muted); font-size: .88rem; line-height: 1.6; }
+.rst-content figure figcaption p { margin-bottom: 9px; }
+footer { color: var(--dasdc-muted); font-size: .85rem; }
+
+@media screen and (max-width: 1100px) and (min-width: 769px) {
+  .wy-nav-content { padding: 32px 30px; }
+}
+@media screen and (max-width: 768px) {
+  .wy-nav-side, .wy-menu-vertical, .wy-side-nav-search { width: 300px; }
+  .wy-side-scroll { width: 320px; }
+  .wy-nav-content-wrap { margin-left: 0; }
+  .wy-nav-content { padding: 26px 20px; }
+  .rst-content h1 { font-size: 1.8rem; }
+  .rst-content h2 { font-size: 1.3rem; }
+  .rst-content .wy-table-responsive table.docutils { min-width: 570px; }
+  .rst-content div[class^="highlight"] pre { padding: 15px; }
+}
+
+/* Preserve readable paper labels in narrow content columns. */
+@media screen and (max-width: 1000px) {
+  img.prediction-figure { content: url("paper/sweep-predictions-stacked.png"); }
+  img.alignment-figure { content: url("paper/domain-alignment-stacked.png"); }
+}
+
+/* Keep labels readable on phone-sized screens. */
+@media screen and (max-width: 600px) {
+  img.workflow-figure, img.overview-figure, img.paper-figure { width: 100%; }
+}

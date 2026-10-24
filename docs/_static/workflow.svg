@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="378" viewBox="0 0 1080 378" role="img" aria-labelledby="title desc">
+  <title id="title">DASDC workflow</title>
+  <desc id="desc">The simulated domain follows simulation, simulated feature extraction and annotation into training. The real domain supplies target features to training and prediction. The trained ensemble feeds prediction.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0 8 4 0 8" fill="none" stroke="#62818b" stroke-width="1.6"/></marker>
+  </defs>
+  <rect x="1" y="1" width="1078" height="376" rx="12" fill="#f7fafb" stroke="#dce6ea"/>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <text x="28" y="35" fill="#526f79" font-size="12" font-weight="700" letter-spacing="1.5">SIMULATED DOMAIN</text>
+    <text x="28" y="226" fill="#526f79" font-size="12" font-weight="700" letter-spacing="1.5">REAL DOMAIN</text>
+    <g fill="none" stroke="#62818b" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M240 104 H286"/>
+      <path d="M498 104 H544"/>
+      <path d="M756 104 H802"/>
+      <path d="M240 293 H286"/>
+      <path d="M498 293 H802"/>
+      <path d="M498 270 C645 270 660 152 802 132"/>
+      <path d="M914 156 V245"/>
+    </g>
+    <g fill="#fff" stroke="#cbdce2" stroke-width="1.5">
+      <rect x="28" y="59" width="212" height="97" rx="8"/>
+      <rect x="286" y="59" width="212" height="97" rx="8"/>
+      <rect x="544" y="59" width="212" height="97" rx="8"/>
+      <rect x="28" y="248" width="212" height="89" rx="8"/>
+      <rect x="286" y="248" width="212" height="89" rx="8"/>
+    </g>
+    <g fill="#e9f5f2" stroke="#8ac1b8" stroke-width="1.5">
+      <rect x="802" y="59" width="250" height="97" rx="8"/>
+      <rect x="802" y="248" width="250" height="89" rx="8"/>
+    </g>
+    <g fill="#0d746f" font-size="12" font-weight="700">
+      <text x="44" y="82">01</text><text x="302" y="82">02</text><text x="560" y="82">04</text><text x="818" y="82">05</text><text x="302" y="271">03</text><text x="818" y="271">06</text>
+    </g>
+    <g fill="#193e4a" font-size="18" font-weight="650">
+      <text x="44" y="108">simu</text><text x="302" y="108">calc_domain</text><text x="560" y="108">data_annotation</text><text x="818" y="108">train</text>
+      <text x="44" y="281">Population VCF</text><text x="302" y="297">calc_target</text><text x="818" y="297">pred</text>
+    </g>
+    <g fill="#536d78" font-size="13">
+      <text x="44" y="135">Generate sequences</text><text x="302" y="135">Extract simulated features</text><text x="560" y="135">Label and split datasets</text><text x="818" y="135">Learn an adaptive ensemble</text>
+      <text x="44" y="307">Phased · one chromosome</text><text x="44" y="324">per file · one population</text><text x="302" y="324">Extract features + positions</text><text x="818" y="324">Predict classes + probabilities</text>
+      <text x="588" y="320">Target features + positions</text><text x="929" y="207">Ensemble</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,87 @@
+{
+  "article": "Song et al. (2024), Advanced Science 11(14):2304842",
+  "doi": "https://doi.org/10.1002/advs.202304842",
+  "article_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11005742/",
+  "pdf_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC11005742.1/PMC11005742.1.pdf",
+  "retrieved": "2026-10-24",
+  "source": "NLM PubMed Central Article Datasets on AWS; published PDF, not HTML thumbnails",
+  "pdf_sha256": "7c19da146f7a73a165ea2f503bdfa0d25c626574cdcb5d26138ef10befccd37f",
+  "copyright": "2024 The Authors",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "coordinate_convention": "Pillow left, upper, right, lower in source image pixels",
+  "figures": [
+    {
+      "file": "sweep-predictions.png",
+      "source": "Paper Fig. 7b, PDF page 10, image Im8.jpg",
+      "source_size": [
+        1992,
+        2586
+      ],
+      "source_sha256": "16d8562a73819e56f2b37c56cd83f30fd5558caaa2e00eee11deeecc9163e805",
+      "crop_boxes": {
+        "NR6A1": [
+          0,
+          1280,
+          670,
+          1508
+        ],
+        "FSHbeta": [
+          0,
+          1508,
+          670,
+          1740
+        ]
+      },
+      "changes": "CMYK to RGB; crop two complete locus panels; arrange horizontally; add descriptive headers and Mb unit reminder. Original probabilities, axes and points preserved."
+    },
+    {
+      "file": "domain-alignment.png",
+      "sources": [
+        {
+          "source": "Paper Fig. 1b, PDF page 3, Im2.jpg",
+          "source_size": [
+            2050,
+            1608
+          ],
+          "crop_box": [
+            1125,
+            0,
+            2050,
+            925
+          ],
+          "sha256": "79ab09bd39acd8062f16d42d49b2d5772844113d7f561c46db1e4bc1fa258f2d"
+        },
+        {
+          "source": "Paper Fig. 3a, PDF page 5, Im4.jpg",
+          "source_size": [
+            1500,
+            708
+          ],
+          "crop_box": [
+            0,
+            0,
+            750,
+            708
+          ],
+          "sha256": "d078f297f80ea253cc9ae25313cb257ed48c6ea280e5d1fe6eea77872d614e20"
+        }
+      ],
+      "changes": "CMYK to RGB where needed; crop complete PCA panels with marginal histograms and legends; remove original panel letters outside plots; rescale raw panel uniformly; add A/B headings and CEU population subtitles. Remove paper figure numbers from subtitles. Recolor only orange simulated-data marks in panel B to red, including contours, histograms and legend swatch. Blue real-data marks, plot geometry, axes, values and annotations preserved. PCA coordinate systems remain separate.",
+      "color_edit": {
+        "method": "Deterministic per-pixel color substitution; no generated or redrawn data.",
+        "panel": "B",
+        "from": "orange",
+        "to": "red",
+        "changed_pixels": 22059,
+        "verification": "All plot pixels outside the orange color mask are byte-identical; panel A plot is byte-identical."
+      },
+      "sha256": "e4a0aafdc2cd68041435330b50c9cb1f9c09c6838c37565ad426f5f4f4881291",
+      "stacked_sha256": "43c7efd0f53345603973ec7f743f72a16ee632b23c38a7634e0842bb7db3e8d4"
+    }
+  ],
+  "responsive_layouts": {
+    "sweep-predictions-stacked.png": "Same two panels stacked without further rescaling or edits.",
+    "domain-alignment-stacked.png": "Same two panels stacked without further rescaling or edits."
+  }
+}
