@@ -259,7 +259,7 @@ Use the ``calc_target`` function to convert the real genome data into the featur
 **Parameter description:**
 
 ``-i`` or ``--input``
-   Path to the folder which contains the real data files of **VCF** format and composed of a single chromosome, or one or more real data files of **VCF** format and composed of a single chromosome (with ``,`` as the separator).
+   Path to a folder containing phased, single-population **VCF** or **VCF.GZ** files split by chromosome, or one or more such files (with ``,`` as the separator). Phase genotypes before feature extraction.
 
 ``-o`` or ``--out``
    The path of output folder or file.
@@ -270,10 +270,10 @@ Use the ``calc_target`` function to convert the real genome data into the featur
    Discard windows containing fewer than *n* SNPs. The default and recommended minimum is 250. The CLI accepts smaller values, but their use has not been validated by this project.
 
 ``--window-size``
-   The window size for converting feature map. Default is 1000000.
+   The genomic context used to construct each feature map and make each prediction. Default is 1000000 bp.
 
 ``--window-step``
-   The step of windows. Default is ``window_size / 20``, i.e., 50000.
+   The distance between successive windows. Default is ``window_size / 20``, i.e., 50000 bp. It controls prediction spacing; the reported interval width is determined by the window size.
 
 ``--core``
    The number of CPU cores used by the program. Use a multiple of 8 where resources permit and do not exceed *n* × 8 (*n* is the number of input files or files in a folder). Default value is 8.
@@ -291,6 +291,8 @@ Use the ``calc_target`` function to convert the real genome data into the featur
    dasdc calc_target -i real_data -o real_feature
 
 ``real_data`` is a folder which contains only VCF format data with a single chromosome; ``real_feature`` is a folder which stores output feature files that correspond with the input VCF data.
+
+Create ``real_data`` yourself and supply phased data split by chromosome. With the default 1 Mb window and 50 kb step, each prediction describes the central 50 kb interval using 475 kb of context on each side. Both prediction backends report the central 5% of each input window, so changing the step alone does not change the reported interval width.
 
 -----------------------------------------------------------------------
 Step 4: Data Labeling for Simulated Dataset
@@ -559,3 +561,5 @@ BFS Model
 -----------------------------------------------------------------------
 FAQ
 -----------------------------------------------------------------------
+
+Report problems through the `GitHub issue tracker <https://github.com/soo-h/DASweepDetect/issues>`_. The upstream project also lists DASDC Communication QQ Group: **602055867**.

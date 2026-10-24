@@ -14,7 +14,7 @@ DASDC is a deep learning tool that uses domain adversarial neural networks (DANN
 
 ## Quick Start
 
-The repository includes simulation and label configurations, but not `real_data/`. Before running the pipeline, supply single-population VCF or VCF.GZ files split by chromosome. Larger demonstration files and intermediate results are available from [Mendeley Data](https://data.mendeley.com/datasets/vdg2nbpc4j).
+The repository includes simulation and label configurations, but not `real_data/`. Before running the pipeline, supply phased, single-population VCF or VCF.GZ files split by chromosome. Larger demonstration files and intermediate results are available from [Mendeley Data](https://data.mendeley.com/datasets/vdg2nbpc4j).
 
 ```shell
 # TensorFlow workflow: use Python 3.8 or 3.9.
@@ -41,6 +41,13 @@ Because this installation is editable, do not move or delete the cloned reposito
 without reinstalling DASDC.
 
 TensorFlow prediction currently requires `-M 5` and an ensemble directory containing exactly five sub-model directories.
+
+`--window-size` controls the genomic context used for each prediction;
+`--window-step` controls the distance between successive windows. With the
+default 1 Mb window and 50 kb step, each prediction describes the central
+50 kb interval using 475 kb of context on each side. The reported interval
+is the central 5% of the window, so changing the step alone does not change
+its width.
 
 ## PyTorch GPU Backend
 
@@ -98,9 +105,14 @@ Pre-trained models for specific populations are available at [Mendeley Data](htt
 | *Sus scrofa domestica* | Large White pig | `available_models/Sus_scrofa/LW` |
 | *Anopheles gambiae* | Burkina Faso | `available_models/Anopheles_gambiae/BFS` |
 
+## Support
+
+Report problems through the [GitHub issue tracker](https://github.com/soo-h/DASweepDetect/issues).
+The upstream project also lists DASDC Communication QQ Group: **602055867**.
+
 ## References
 
-- Song et al. (2024) — DASDC: [doi:10.1002/advs.202304842](https://doi.org/10.1002/advs.202304842)
+- Song H, Chu J, Li W, et al. (2024). A Novel Approach Utilizing Domain Adversarial Neural Networks for the Detection and Classification of Selective Sweeps. *Advanced Science*. [doi:10.1002/advs.202304842](https://doi.org/10.1002/advs.202304842)
 - Kern & Schrider (2016) — discoal: [doi:10.1093/bioinformatics/btw556](https://doi.org/10.1093/bioinformatics/btw556)
 
 ## License
