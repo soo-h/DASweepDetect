@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.tmp-*/
+.ipynb_checkpoints/
+docs/_build/
+
+# Local skill link points outside this repository.
+/.agents/skills
