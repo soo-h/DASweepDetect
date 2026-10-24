@@ -1,5 +1,19 @@
 import os
 
+
+def ensure_output_directory(outdir):
+    """Create an output directory and return its absolute path with a separator."""
+
+    if outdir == '.':
+        outdir = os.getcwd()
+    outdir = os.path.abspath(outdir)
+    if not outdir.endswith(os.path.sep):
+        outdir += os.path.sep
+    if not os.path.exists(outdir):
+        os.makedirs(outdir, exist_ok=True)
+    return outdir
+
+
 def check_region_paramater(position):
     if position == "None":
         position = None
@@ -21,18 +35,18 @@ def check_step(step,window_size):
 def get_input_file(path):
     """
     input : path
-    reurn : 
+    reurn :
             if path is directory : list ,consist of file name
             if path is file which split of , : list, consist of file name
-    
+
     """
 
     if os.path.isdir(path):
         if not path.endswith('/'):
             path = path + '/'
-    
+
         nameSet = [path + name for name in os.listdir(path)]
-    
+
     else:
         nameSet = path.split(',')
     return nameSet
@@ -46,7 +60,7 @@ def check_label_config(lab_dict):
             print(e)
             print("Error: label must be integers and greater than or equal to 0 !")
 
-    # check labels and categories 
+    # check labels and categories
     if len(lab_dict) != len(set(lab_dict.values())):
         raise ValueError('The category must correspond to the label one by one.\n' + \
                          '\tCheck whether the label is repeated in different categories!')

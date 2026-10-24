@@ -5,7 +5,7 @@ import subprocess
 import numpy as np
 import tensorflow as tf
 #from tensorflow.keras.utils import to_categorical
-from keras.utils import np_utilsa
+from keras.utils import np_utils
 import matplotlib.pyplot as plt
 
 from util.pretreatment import max_minNorm
@@ -36,7 +36,7 @@ def sampled_target_data(target_data, extraction_number):
 def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1,stop=5):
     """
     Train a DANN model with early stopping.
-    
+
     Args:
         epoch (int): Maximum number of epochs to train.
         model_name (str): Name for saving the model.
@@ -45,7 +45,7 @@ def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1
         val_dataset (tf.data.Dataset): Validation dataset.
         lamda (float): Alignment loss hyperparameter.
         stop (int): Early stopping parameter.
-        
+
     Returns:
         tuple: Name of the best model if early stopping occurs, otherwise 0 and the log filename.
     """
@@ -54,7 +54,7 @@ def train(epoch,model_name, source_dataset, target_dataset, val_dataset ,lamda=1
     f = open(log, 'w')
     DANN_name = model_name
     lamda = lamda
-    
+
     lr = 1e-2
     optimizer = tf.keras.optimizers.SGD(lr)
     loss_class = tf.keras.losses.categorical_crossentropy

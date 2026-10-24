@@ -13,29 +13,9 @@ from script_simu_fev.Data_To_Feature_pipline import write_haf, write_sfs, write_
     , write_safe, write_ihs, write_nsl, write_dihh
 from util.window_tools import ms_read_pipline
 from util.tools_feature import loadstastic
-from util.check_tools import get_input_file
+from util.check_tools import get_input_file, ensure_output_directory
 
 warnings.filterwarnings("ignore")
-
-nameSet = sys.argv[1]
-
-coreNum = int(sys.argv[2])
-cutoff = int(sys.argv[3])
-
-outdir = sys.argv[4]
-
-nameSet = get_input_file(nameSet)
-print(nameSet)
-
-if outdir == '.':
-    outdir = os.getcwd()
-if not outdir.endswith('/'):
-    outdir = f'{str(outdir)}/'
-
-if not os.path.exists(outdir):
-    subprocess.call(f"mkdir {outdir}",shell=True)
-    
-min_sample = 1500
 
 
 def iter_file(fileSet):
@@ -109,11 +89,11 @@ def calc_stastic_simu(file, core_num, cutoff, opt):
 
 
 def calc_ehh_base(name_list, core_num, cutoff, outdir):
-    
+
     process_number = 3
     core_number_every_process = core_num // process_number
     residue_core = core_num % process_number
-    
+
     # Allocation cpu
     if core_number_every_process > 0:
         core_list = [core_number_every_process if i != process_number-1 \
@@ -123,8 +103,8 @@ def calc_ehh_base(name_list, core_num, cutoff, outdir):
     else:
         core_list = [1,1,1]
         core_numer_p_process = core_num
-    
-    
+
+
     ihs = multiprocessing.Process(target=write_ihs, args=(name_list, cutoff, outdir, core_list[0]))
     nsl = multiprocessing.Process(target=write_nsl, args=(name_list, cutoff, outdir, core_list[1]))
     dihh = multiprocessing.Process(target=write_dihh, args=(name_list, cutoff, outdir, core_list[2]))
@@ -141,16 +121,15 @@ def get_featureMap(nameSet, outdir):
     for file in nameSet:
         name = file.split('/')[-1]
         opt = outdir + name
-        # 整理生成特征图
+
         featureNameSet = [outdir + caluc_name for caluc_name in os.listdir(outdir) if caluc_name.startswith(name)]
         featureMap = loadstastic(copy.deepcopy(featureNameSet))
 
         # if not remain
-        # 删除中间文件
         cmd = 'rm -f ' + ' '.join(featureNameSet)
         print(cmd)
         subprocess.call(cmd, shell=True)
-        # 保存特征图
+        # save feature
         np.save(f'{opt}_featureMap', featureMap)
     return 0
 
@@ -208,7 +187,7 @@ def process_scheduling():
     if coreNum > max_core_number:
         print(f"Warning: too much cpu!! Recommend {corenumber_need_by_one_file * fileNum}")
 
- 
+
     if coreNum > ehh_core_number:
         residul_core = coreNum - ehh_core_number
         ehh = multiprocessing.Process(target=calc_ehh_base, args=(nameSet, ehh_core_number, cutoff, outdir))
@@ -275,11 +254,16 @@ def process_scheduling():
         time.sleep(30)
     return 0
 
-
-
-
-
-
 if __name__ == '__main__':
+    nameSet = sys.argv[1]
+    coreNum = int(sys.argv[2])
+    cutoff = int(sys.argv[3])
+    outdir = sys.argv[4]
+    min_sample = 1500
+
+    nameSet = get_input_file(nameSet)
+    print(nameSet)
+    outdir = ensure_output_directory(outdir)
+
     process_scheduling()
     get_featureMap(nameSet, outdir)
