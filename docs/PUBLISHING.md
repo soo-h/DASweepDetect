@@ -12,13 +12,13 @@ Ubuntu 24.04, Python 3.13, `docs/conf.py`, and the documentation dependencies in
 
 | Source | Purpose |
 |---|---|
-| `docs/index.rst` | Overview, linked module table, data flow and navigation |
+| `docs/index.rst` | Prediction examples, model architecture, usage entry points and citation |
+| `docs/workflow/overview.rst` | Detection from scratch, prerequisites, module table and data-flow diagram |
 | `docs/installation.rst` | Environment setup and backend requirements |
 | `docs/workflow/*.rst` | Six module guides with examples and parameter tables |
 | `docs/parameter_inference.rst` | Canonical Relate procedure and simulation priors; replaces root `Parameter_Inference.md` |
-| `docs/figure_sources.rst` | Figure attribution and adaptation details |
 | `docs/outputs.rst` | Prediction columns, labels and interpretation |
-| `docs/models.rst` | Population-specific trained model resources and inference |
+| `docs/models.rst` | Detection with an existing model and population-specific model resources |
 | `docs/faq.rst` | Where to report a problem |
 | `docs/README.rst` | Existing manual URL retained as an index to the new pages |
 | `docs/_static/` | Local styles, diagrams, paper-derived figures and the downloadable Relate preparation script |

@@ -166,3 +166,11 @@ footer { color: var(--dasdc-muted); font-size: .85rem; }
 @media screen and (max-width: 600px) {
   img.workflow-figure, img.overview-figure, img.paper-figure { width: 100%; }
 }
+
+/* Keep the workflow module table readable on narrow screens. */
+.rst-content .wy-table-responsive table.module-table { min-width: 0; }
+.module-table td:first-child a { overflow-wrap: normal; word-break: normal; }
+
+@media screen and (max-width: 600px) {
+  .rst-content .wy-table-responsive table.module-table { min-width: 350px; }
+}

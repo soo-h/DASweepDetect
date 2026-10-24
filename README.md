@@ -20,14 +20,14 @@ DASDC learns population genomic signatures of selection from simulated data, giv
 <img src="docs/_static/paper/sweep-predictions.png" alt="Hard and soft selective sweep predictions in the LW pig population: NR6A1 and FSHβ" width="700" />
 
 *Hard and soft selective sweep predictions in the LW pig population.*
-[Figure sources and adaptations](https://dasweepdetect.readthedocs.io/en/latest/figure_sources.html).
 
 ## 2. Installation and usage
 
 For installation instructions and usage examples, visit the
 [DASDC documentation](https://dasweepdetect.readthedocs.io/en/latest/).
 
-The manual covers the [complete selective sweep detection workflow](https://dasweepdetect.readthedocs.io/en/latest/index.html#workflow-modules),
+The manual covers [detection from scratch](https://dasweepdetect.readthedocs.io/en/latest/workflow/overview.html),
+[detection with an existing model](https://dasweepdetect.readthedocs.io/en/latest/models.html#two-step-workflow),
 [parameter inference](https://dasweepdetect.readthedocs.io/en/latest/parameter_inference.html),
 and [prediction outputs](https://dasweepdetect.readthedocs.io/en/latest/outputs.html).
 
@@ -42,8 +42,8 @@ Population-specific models are available for human CEU, Large White pigs
 (LW), and Burkina Faso *Anopheles gambiae* (BFS). Model and example data
 resources are hosted on [Mendeley Data](https://data.mendeley.com/datasets/vdg2nbpc4j/4).
 
-To predict with an existing model, follow the
-[trained models guide](https://dasweepdetect.readthedocs.io/en/latest/models.html).
+To detect selective sweeps with an existing model, follow the
+[existing-model detection guide](https://dasweepdetect.readthedocs.io/en/latest/models.html).
 Use the model for its intended population, with matching feature construction
 and backend. For a new target population, follow the complete workflow to
 train a population-specific model.
@@ -75,5 +75,5 @@ The DASDC Communication QQ Group is **602055867**.
 ## 6. License
 
 DASDC is released under the [MIT License](LICENSE).
-Paper-derived figures retain the attribution and licensing documented in
-[Figure sources and adaptations](https://dasweepdetect.readthedocs.io/en/latest/figure_sources.html).
+Paper-derived figures are adapted from [Song et al. (2024)](https://doi.org/10.1002/advs.202304842),
+© 2024 The Authors, under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

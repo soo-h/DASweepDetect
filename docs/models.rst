@@ -1,8 +1,10 @@
-Trained models
-==============
+Detect selective sweeps with an existing model
+==============================================
 
-This page covers inference with an already-trained, population-specific DASDC
-ensemble.
+Use an existing population-specific DASDC model to detect and classify
+selective sweeps. Choose a matching model from the :ref:`catalog <model-catalog>`,
+then extract features and run prediction using the
+:ref:`two-step workflow <two-step-workflow>`; no new model training is needed.
 
 Training in the study
 ---------------------
@@ -13,10 +15,12 @@ models trained for human CEU, Large White pigs (LW), and Burkina Faso
 *Anopheles* (BFS), using their population-specific genetic parameters.
 Training aligns labeled simulations with real target-domain features.
 
-For a new target population, follow the :ref:`six-module workflow
-<workflow-modules>` using its parameters and target-domain data. Use a
+For a new target population, follow :doc:`detection from scratch
+<workflow/overview>` using its parameters and target-domain data. Use a
 saved ensemble for the population and feature setup on which it was trained;
 performance on other populations or species requires separate evaluation.
+
+.. _model-catalog:
 
 Model catalog
 -------------
@@ -47,8 +51,10 @@ collection, not files bundled with the Git clone.
 
 .. _two-step-workflow:
 
-Prediction with a saved ensemble
---------------------------------
+.. _prediction-with-a-saved-ensemble:
+
+Run the two-step workflow
+-------------------------
 
 Once a matching trained ensemble is available,
 :doc:`extract target features <workflow/calc_target>` and run

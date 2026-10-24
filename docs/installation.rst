@@ -78,9 +78,8 @@ In the activated Python 3.8–3.9 environment:
 
 Every command can also be invoked as ``python -m dasdc <command>``.
 
-Next, choose a module from the :ref:`workflow overview <workflow-modules>`.
-If you already have a compatible population-specific ensemble, see
-:doc:`prediction with a trained model <models>`.
+Next, :doc:`detect selective sweeps from scratch <workflow/overview>` or
+:ref:`detect selective sweeps with an existing model <two-step-workflow>`.
 
 .. _tensorflow-gpu:
 

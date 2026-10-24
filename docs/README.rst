@@ -3,8 +3,7 @@
 User guide
 ==========
 
-Start with the :doc:`overview <index>` for the six modules, their functions
-and links. The section links below preserve the original manual address.
+Start with the :doc:`overview <index>` for the method and usage entry points. The section links below preserve the original manual address.
 
 Configuration Required for Operation
 ------------------------------------
@@ -14,7 +13,7 @@ Configuration Required for Operation
 Overview
 --------
 
-:doc:`index` — Read the overview, module map and data-flow diagram.
+:doc:`index` — Read the prediction examples and model architecture.
 
 Getting Started
 ---------------
@@ -24,7 +23,7 @@ Getting Started
 Usage
 -----
 
-:doc:`index` — Choose a workflow module from the overview.
+:doc:`workflow/overview` — Detect selective sweeps from scratch, including model training.
 
 Step 1: Simulate Dataset for Model Training
 -------------------------------------------
@@ -64,7 +63,7 @@ Output
 Available Models
 ----------------
 
-:doc:`models` — Browse the population-specific model catalog.
+:doc:`models` — Detect selective sweeps with an existing population-specific model.
 
 FAQ
 ---
