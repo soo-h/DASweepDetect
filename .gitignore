@@ -10,3 +10,6 @@ docs/_build/
 
 # Local skill link points outside this repository.
 /.agents/skills
+
+# Local development notes.
+/DEVLOP/

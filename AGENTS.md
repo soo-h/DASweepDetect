@@ -2,17 +2,17 @@
 
 ## Project Structure & Module Organization
 
-`DASD.py` is the command-line entry point for the six-stage DASDC workflow. Core stages live in `DASD/`: simulation, simulated/VCF feature extraction, data labeling, DANN training, and ensemble prediction. Shared model, statistics, validation, preprocessing, and multiprocessing code belongs in `DASD/util/`. Format-specific feature routines are separated into `DASD/script_simu_fev/` and `DASD/script_real_fev/`. Example configurations and small expected prediction files are under `example/`; user documentation is in `README.md`, `Parameter_Inference.md`, and `docs/`. Treat the tracked `discoal` executable as a third-party binary, not generated source.
+`dasdc/` provides the installed command-line interface for the six-stage workflow. TensorFlow remains the legacy training backend; `DASD/DANN_train_torch.py`, `DASD/pred_ensemble_torch.py`, and `DASD/util/torch_dann.py` implement the optional PyTorch backend. Shared statistics, validation, and preprocessing code belongs in `DASD/util/`; format-specific feature routines live in `DASD/script_simu_fev/` and `DASD/script_real_fev/`. Tests are under `tests/`, examples under `example/`, and user documentation in `README.md` and `docs/`. Treat `discoal` as a tracked third-party binary.
 
 ## Setup, Build, and Development Commands
 
-This project targets Linux and Python 3.8 exactly; it has no separate build step.
+The package syntax supports Python 3.8 or newer. TensorFlow 2.7 is limited to Python 3.8-3.9; install a CUDA-enabled PyTorch build separately for GPU training.
 
 ```bash
-python3.8 -m pip install -r require.txt  # install pinned runtime dependencies
+python -m pip install -e .               # install dependencies and the dasdc command
 chmod 755 discoal                        # enable the simulator
-python3.8 DASD.py --help                 # inspect pipeline subcommands
-python3.8 -m py_compile DASD.py DASD/*.py DASD/util/*.py
+dasdc --help                             # inspect pipeline subcommands
+python -m unittest discover -s tests -v
 sphinx-build -b html docs docs/_build    # rebuild optional HTML documentation
 ```
 
@@ -24,7 +24,7 @@ Use four-space indentation and PEP 8 conventions. Prefer `snake_case` for module
 
 ## Testing Guidelines
 
-There is currently no automated test suite or coverage threshold. Every change must pass `py_compile` and a focused end-to-end smoke test of the modified stage. For numerical changes, compare shapes, labels, and representative values against known inputs; record seeds where randomness is involved. Do not silently alter source VCF, simulation, or example data. Place future regression tests in `tests/` using `test_*.py` names and document their runner.
+Use the standard-library `unittest` suite in `tests/`; no coverage threshold is configured. Every change must pass the suite, `py_compile`, and a focused smoke test of the modified stage. For numerical changes, compare shapes, labels, and representative values against known inputs and record random seeds. Do not silently alter source VCF, simulation, or example data. Name new regression files `test_*.py`.
 
 ## Commit & Pull Request Guidelines
 
